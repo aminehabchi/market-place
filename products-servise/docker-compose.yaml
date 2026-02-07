@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: mongo_dev
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: appdb
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+    build:
+      context: ./products       
+      dockerfile: dockerfile
+    container_name: java_backend_dev
+    working_dir: /app
+    volumes:
+      - ./products:/app       
+      - ~/.gradle:/home/gradle/.gradle 
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://admin:admin123@mongodb:27017/appdb?authSource=admin
+    depends_on:
+      - mongodb
+
+volumes:
+  mongo_data:
