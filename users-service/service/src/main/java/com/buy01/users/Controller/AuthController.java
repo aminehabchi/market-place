@@ -1,18 +1,27 @@
 package com.buy01.users.Controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.buy01.users.DTOs.RegisterDTOs;
+import com.buy01.users.DTOs.RegisterReqDTOs;
+import com.buy01.users.DTOs.RegisterResDTOs;
+import com.buy01.users.Service.AuthService;
 
 @RestController
 @RequestMapping("api/auth")
 public class AuthController {
+    private final AuthService authService;
+
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
+
     @PostMapping("/register")
-    public String register(@RequestBody RegisterDTOs req) {
-        return req.email();
+    public ResponseEntity<RegisterResDTOs> register(@RequestBody RegisterReqDTOs req) {
+        return ResponseEntity.ok(authService.register(req));
     }
     // @PostMapping("/login")
 }
