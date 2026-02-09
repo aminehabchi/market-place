@@ -1,4 +1,4 @@
-package com.example.products.utils;
+package com.example.products.shared;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -15,7 +15,7 @@ import lombok.Setter;
 public abstract class BaseEntity {
     @Id
     private UUID id = UUID.randomUUID();
-    
+
     @Field("created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 

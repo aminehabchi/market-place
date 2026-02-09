@@ -1,5 +1,4 @@
-package com.example.products.utils;
-
+package com.example.products.shared;
 
 import java.util.Map;
 
