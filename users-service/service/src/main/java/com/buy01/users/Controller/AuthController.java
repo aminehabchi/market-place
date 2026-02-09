@@ -6,12 +6,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.buy01.users.DTOs.LoginReqDTOs;
+import com.buy01.users.DTOs.LoginResDTOs;
 import com.buy01.users.DTOs.RegisterReqDTOs;
 import com.buy01.users.DTOs.RegisterResDTOs;
 import com.buy01.users.Service.AuthService;
 
 @RestController
-@RequestMapping("api/auth")
+@RequestMapping({"/api/auth", "/auth"})
 public class AuthController {
     private final AuthService authService;
 
@@ -23,5 +25,10 @@ public class AuthController {
     public ResponseEntity<RegisterResDTOs> register(@RequestBody RegisterReqDTOs req) {
         return ResponseEntity.ok(authService.register(req));
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResDTOs> login(@RequestBody LoginReqDTOs req) {
+        return ResponseEntity.ok(authService.login(req));
+    } 
     // @PostMapping("/login")
 }

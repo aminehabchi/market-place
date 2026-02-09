@@ -11,10 +11,11 @@ public record User(
         String username,
         String email,
         @JsonIgnore String password,
-        String role) {
+        String role,
+        String avatarUrl) {
     public User {
         if (role == null) {
-            role = "ROLE_ADMIN";
+            role = "CLIENT";
         }
     }
 }
