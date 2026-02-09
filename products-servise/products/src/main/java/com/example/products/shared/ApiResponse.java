@@ -14,6 +14,10 @@ public record ApiResponse<T>(
         return new ApiResponse<>(true, data, null, 200, null);
     }
 
+    public static <T> ApiResponse<T> success(T data, int status) {
+        return new ApiResponse<>(true, data, null, status, null);
+    }
+
     public static <T> ApiResponse<T> successStatus(int status) {
         return new ApiResponse<>(true, null, null, status, null);
     }
