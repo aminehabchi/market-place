@@ -1,0 +1,62 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=123123
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  users-service:
+    build: 
+      context: ./service
+    restart: on-failure
+    container_name: users-service
+    ports:
+      - "8080:8080"
+    environment:
+      - JWT_SECRET=4cfeee175e498e32039c7e804957663cb8e09b58a0902bf56222acab991cb4bd955bdf3c25942131e432c59be57d411c31f25c6432bd18fd8f006b8913636da2
+      - JWT_EXP=3600000
+      - MONGODB_USERNAME=admin
+      - MONGODB_PWD=123123
+      - MONGODB_HOST=mongodb
+      - MONGODB_PORT=27017
+      - MONGO_DB=users_db
+      - MONGODB_AUTH=admin
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - mongodb
+      - kafka
+    volumes:
+      - ./service/src:/app/src
+      - ~/.gradle:/root/.gradle
+    working_dir: /app
+volumes:
+  mongo_data:
