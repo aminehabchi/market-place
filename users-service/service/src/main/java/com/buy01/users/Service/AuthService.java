@@ -8,26 +8,33 @@ import com.buy01.users.DTOs.LoginReqDTOs;
 import com.buy01.users.DTOs.LoginResDTOs;
 import com.buy01.users.DTOs.RegisterReqDTOs;
 import com.buy01.users.DTOs.RegisterResDTOs;
+import com.buy01.users.DTOs.UserCreatedEvent;
 import com.buy01.users.Entity.User;
 import com.buy01.users.Repository.UserRepository;
 import com.buy01.users.Utils.JwtUtils;
+import org.springframework.kafka.core.KafkaTemplate;
 
 @Service
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils,
+            KafkaTemplate<String, Object> kafkaTemplate) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     public RegisterResDTOs register(RegisterReqDTOs req) {
         String role = normalizeRole(req.role());
         User user = new User(null, req.username(), req.email(), passwordEncoder.encode(req.password()), role, null);
         userRepository.save(user);
+        UserCreatedEvent event = new UserCreatedEvent(user.id(), user.email(), user.username());
+        kafkaTemplate.send("user-events", user.id(), event);
         return new RegisterResDTOs("user created");
     }
 
