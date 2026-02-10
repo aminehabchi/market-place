@@ -1,14 +1,32 @@
 # Ports
 
-## products-sevice
+## products-sevice 
 ### service ==> 8000
 ### mongodb ==> 27017
 
 
+## users-sevice
+### service ==> 8001
+### mongodb ==> 27018
 
-# chokidar
-Chokidar is a popular, fast, and efficient cross-platform file watching library for Node.js. It serves as a wrapper around Node's built-in fs.watch/fs.watchFile methods to provide reliable file system monitoring, often used by tools like Webpack, Gulp, and PM2 to detect file changes and trigger actions. 
-```
-npm install chokidar-cli
-npm install -g chokidar-cli
-```
+
+## media-sevice
+### service ==> 8002
+### mongodb ==> 27019
+
+
+## Eureka-server 
+### port => 8761
+
+
+## gateway
+### port => 9000
+
+
+## redis 
+### port => 6379
+
+
+## frontend 
+### port => 4200
+

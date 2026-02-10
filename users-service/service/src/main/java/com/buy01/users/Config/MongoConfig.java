@@ -1,11 +1,12 @@
 package com.buy01.users.Config;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
+
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 
 @Configuration
 public class MongoConfig extends AbstractMongoClientConfiguration {
@@ -44,6 +45,8 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
                 port,
                 database,
                 authenticationDatabase);
+
+            System.out.println("--------------------------------------> "+connectionString+" --------------------");
         return MongoClients.create(connectionString);
     }
 }

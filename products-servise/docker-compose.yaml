@@ -1,0 +1,34 @@
+services:
+  products-service-mongodb:
+    build:
+      context: ./database   
+      dockerfile: Dockerfile
+    container_name: products-service-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: amine
+      MONGO_INITDB_ROOT_PASSWORD: 1234
+      MONGO_INITDB_DATABASE: DB
+    volumes:
+      - mongo_data:/data/db
+
+  products-service:
+    build:
+      context: ./products
+      dockerfile: Dockerfile
+    container_name: springboot-backend
+    ports:
+      - "8000:8000"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://amine:1234@products-service-mongodb:27017/DB?authSource=admin&uuidRepresentation=standard
+    depends_on:
+      - products-service-mongodb
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/pom.xml:/app/pom.xml
+      - backend_m2:/root/.m2
+
+volumes:
+  mongo_data:
+  backend_m2:
