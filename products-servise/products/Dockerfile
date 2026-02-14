@@ -1,6 +1,6 @@
 # --- STAGE 1: Build ---
-# Using the latest Maven 3.9 image with Java 25
-FROM maven:3.9-eclipse-temurin-25 AS build
+# Using Maven 3.9 image with Java 21
+FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
 # Cache dependencies
@@ -12,8 +12,8 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # --- STAGE 2: Run ---
-# Use the official Java 25 JRE for a slim final image
-FROM eclipse-temurin:25-jre-jammy
+# Use the official Java 21 JRE for a slim final image
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
 # Copy only the JAR from the build stage
