@@ -32,7 +32,7 @@ public class AuthService {
     public RegisterResDTOs register(RegisterReqDTOs req) {
         String role = normalizeRole(req.role());
         User user = new User(null, req.username(), req.email(), passwordEncoder.encode(req.password()), role, null);
-        userRepository.save(user);
+        user = userRepository.save(user);
         UserCreatedEvent event = new UserCreatedEvent(user.id(), user.email(), user.username());
         kafkaTemplate.send("user-events", user.id(), event);
         return new RegisterResDTOs("user created");
