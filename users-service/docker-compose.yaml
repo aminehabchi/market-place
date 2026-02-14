@@ -11,7 +11,7 @@ services:
     volumes: 
       - mongo_data:/data/db
     networks:
-      - app-network
+      - shared-net
 
   users-service:
     build: 
@@ -32,16 +32,16 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - mongodb
-    networks:
-      - app-network
     volumes:
       - ./service/src:/app/src
       - ~/.gradle:/root/.gradle
     working_dir: /app
+    networks:
+      - shared-net
 
 volumes:
   mongo_data:
 
 networks:
-  app-network:
+  shared-net:
     external: true

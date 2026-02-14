@@ -1,23 +1,24 @@
-# Use official Maven + JDK image
-FROM maven:3.9.4-eclipse-temurin-25
-
-# Set working directory
+# --- STAGE 1: Build ---
+# Using the latest Maven 3.9 image with Java 25
+FROM maven:3.9-eclipse-temurin-25 AS build
 WORKDIR /app
 
-# Copy only the pom.xml first to cache dependencies
-COPY pom.xml ./
-
-# Download dependencies (this will be cached if pom.xml doesn't change)
+# Cache dependencies
+COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
-# Copy the source code
+# Copy source and build
 COPY src ./src
-
-# Build the application
 RUN mvn clean package -DskipTests
 
-# Expose default Spring Boot port
+# --- STAGE 2: Run ---
+# Use the official Java 25 JRE for a slim final image
+FROM eclipse-temurin:25-jre-jammy
+WORKDIR /app
+
+# Copy only the JAR from the build stage
+COPY --from=build /app/target/*.jar app.jar
+
 EXPOSE 8080
 
-# Run the application
-CMD ["mvn", "spring-boot:run"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -6,7 +6,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     networks:
-      - app-network
+      - shared-net
 
   kafka:
     image: confluentinc/cp-kafka:7.6.1
@@ -24,8 +24,8 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     networks:
-      - app-network
+      - shared-net
 
 networks:
-  app-network:
-    driver: bridge
+  shared-net:
+    external: true
