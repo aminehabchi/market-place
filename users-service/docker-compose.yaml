@@ -1,7 +1,7 @@
 services:
-  mongodb:
+  user-mongodb:
     image: mongo:latest
-    container_name: mongodb
+    container_name: user-mongodb
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=123123
@@ -24,7 +24,7 @@ services:
       - JWT_EXP=3600000
       - MONGODB_USERNAME=admin
       - MONGODB_PWD=123123
-      - MONGODB_HOST=mongodb
+      - MONGODB_HOST=user-mongodb
       - MONGODB_PORT=27017
       - MONGO_DB=users_db
       - MONGODB_AUTH=admin
@@ -32,7 +32,7 @@ services:
     networks:
       - microservices-net
     depends_on:
-        - mongodb
+        - user-mongodb
     volumes:
       - ./service/src:/app/src
       - ~/.gradle:/root/.gradle
