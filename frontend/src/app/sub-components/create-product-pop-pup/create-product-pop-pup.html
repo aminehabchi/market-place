@@ -1,0 +1,16 @@
+<div
+  (click)="close()"
+  class="fixed inset-0 bg-yellow bg-opacity-50 flex items-center justify-center z-50"
+>
+  <!-- Centered modal -->
+  <div class="bg-white p-6 rounded shadow-lg w-full max-w-sm">
+    <h2 class="text-xl font-semibold mb-4">Hello!</h2>
+    <p class="text-gray-600">This div is now fully opaque.</p>
+    <button
+      class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+      (click)="close()"
+    >
+      Close
+    </button>
+  </div>
+</div>
