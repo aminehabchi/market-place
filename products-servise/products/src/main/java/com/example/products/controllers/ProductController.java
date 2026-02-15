@@ -35,7 +35,7 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping
+    @GetMapping({ "", "/" })
     @PermitAll
     public ResponseEntity<ApiResponse<List<Product>>> getProducts() {
         return ResponseEntity.ok(ApiResponse.success(productService.getAllProducts()));
@@ -50,7 +50,7 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.success(product));
     }
 
-    @PostMapping
+    @PostMapping({ "", "/" })
     public ResponseEntity<ApiResponse<Product>> createProduct(@RequestBody @Valid CreateProdutDto productDto,
             Authentication authentication) {
         /*******************************************/
