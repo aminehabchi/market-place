@@ -1,0 +1,6 @@
+com/example/shared/common/types/Role.class
+com/example/shared/common/kafkaDtos/KafkaUserCreatedEvent.class
+com/example/shared/common/database/BaseEntity.class
+com/example/shared/common/kafkaDtos/KafkaUserRemovedEvent.class
+com/example/shared/common/utils/ApiResponse.class
+com/example/shared/common/kafkaDtos/KafkaUserUpdatedEvent.class

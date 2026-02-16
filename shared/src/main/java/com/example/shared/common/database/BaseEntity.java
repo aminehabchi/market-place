@@ -1,4 +1,4 @@
-package com.example.products.shared;
+package com.example.shared.common.database;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

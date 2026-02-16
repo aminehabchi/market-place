@@ -1,4 +1,4 @@
-package com.example.products.shared;
+package com.example.shared.common.types;
 
 import java.util.Arrays;
 
