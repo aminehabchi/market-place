@@ -1,6 +1,0 @@
-/home/ahabchi/Desktop/buy-01/shared/src/main/java/com/example/shared/common/types/Role.java
-/home/ahabchi/Desktop/buy-01/shared/src/main/java/com/example/shared/common/utils/ApiResponse.java
-/home/ahabchi/Desktop/buy-01/shared/src/main/java/com/example/shared/common/kafkaDtos/KafkaUserCreatedEvent.java
-/home/ahabchi/Desktop/buy-01/shared/src/main/java/com/example/shared/common/database/BaseEntity.java
-/home/ahabchi/Desktop/buy-01/shared/src/main/java/com/example/shared/common/kafkaDtos/KafkaUserRemovedEvent.java
-/home/ahabchi/Desktop/buy-01/shared/src/main/java/com/example/shared/common/kafkaDtos/KafkaUserUpdatedEvent.java
