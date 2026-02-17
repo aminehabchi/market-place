@@ -1,0 +1,20 @@
+services:
+  gateway:
+    build: ./gateway
+    container_name: gateway
+    ports:
+      - "10000:10000"
+    environment:
+      DISCOVERY : http://eureka-server:8761/eureka
+    volumes:
+      - backend_m2:/root/.m2
+    networks:
+      - shared-net
+
+volumes:
+  mongo_data:
+  backend_m2:
+
+networks:
+  shared-net:
+    external: true

@@ -1,0 +1,38 @@
+services:
+  products-service-mongodb:
+    build: ./database
+    container_name: products-service-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: amine
+      MONGO_INITDB_ROOT_PASSWORD: 1234
+      MONGO_INITDB_DATABASE: DB
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - shared-net
+
+  products-service:
+    build:
+      context: ../
+      dockerfile: products-service/products/Dockerfile
+    container_name: products-service
+    ports:
+      - "8000:8000"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://amine:1234@products-service-mongodb:27017/DB?authSource=admin
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      DISCOVERY : http://eureka-server:8761/eureka
+    depends_on:
+      - products-service-mongodb
+    volumes:
+      - backend_m2:/root/.m2
+    networks:
+      - shared-net
+
+volumes:
+  mongo_data:
+  backend_m2:
+
+networks:
+  shared-net:
+    external: true

@@ -10,7 +10,7 @@ services:
     volumes:
       - mongo_data:/data/db
     networks:
-      - microservices-net
+      - shared-net
 
   users-service:
     build: 
@@ -29,8 +29,10 @@ services:
       - MONGO_DB=users_db
       - MONGODB_AUTH=admin
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - DISCOVERY=http://eureka-server:8761/eureka
+
     networks:
-      - microservices-net
+      - shared-net
     depends_on:
         - user-mongodb
     volumes:
@@ -40,5 +42,5 @@ services:
 volumes:
   mongo_data:
 networks:
-  microservices-net:
+  shared-net:
     external: true
