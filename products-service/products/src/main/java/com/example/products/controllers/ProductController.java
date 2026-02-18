@@ -80,10 +80,10 @@ public class ProductController {
         /*******************************************/
         UUID userId = UUID.randomUUID();
 
-        if (!product.getUserId().equals(userId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(ApiResponse.error("You are not the owner of this product", HttpStatus.FORBIDDEN));
-        }
+        // if (!product.getUserId().equals(userId)) {
+        //     return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        //             .body(ApiResponse.error("You are not the owner of this product", HttpStatus.FORBIDDEN));
+        // }
 
         this.productService.deleteProduct(id);
 
@@ -107,10 +107,10 @@ public class ProductController {
         /*******************************************/
         UUID userId = UUID.randomUUID();
 
-        if (!product.getUserId().equals(userId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(ApiResponse.error("You are not the owner of this product", HttpStatus.FORBIDDEN));
-        }
+        // if (!product.getUserId().equals(userId)) {
+        //     return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        //             .body(ApiResponse.error("You are not the owner of this product", HttpStatus.FORBIDDEN));
+        // }
 
         Product updateProduct = this.productService.updateProduct(product, productDto);
 

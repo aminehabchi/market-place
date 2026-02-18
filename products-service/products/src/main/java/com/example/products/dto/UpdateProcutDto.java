@@ -14,4 +14,6 @@ public class UpdateProcutDto {
 
     @Positive(message = "Price must be greater than 0")
     private Double price;
+
+    private String image;
 }

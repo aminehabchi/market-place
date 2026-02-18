@@ -33,4 +33,10 @@ export class ProductsService {
       `${this.apiUrl}/me`
     );
   }
+
+  deleteProducts(id: string) {
+    return this.http.delete<ApiResponse<any>>(
+      `${this.apiUrl}/${id}`
+    );
+  }
 }
