@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import com.example.shared.common.database.BaseEntity;
 
-
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -30,6 +29,8 @@ public class Product extends BaseEntity {
 
     private double price;
 
+    private String image;
+
     @Field("userId")
     private UUID userId;
 
@@ -37,6 +38,7 @@ public class Product extends BaseEntity {
         this.name = dto.getName();
         this.description = dto.getDescription();
         this.price = dto.getPrice();
+        this.image = dto.getImage();
         this.userId = userId;
     }
 

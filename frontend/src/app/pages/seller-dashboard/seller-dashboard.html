@@ -3,7 +3,7 @@
         <!-- Product Info -->
         <div>
             <span class="text-gray-700 font-medium">
-                Total Products: {{ products.length }}
+                Total Products: {{ products().length }}
             </span>
         </div>
 
@@ -17,7 +17,7 @@
 
     <div class="container mx-auto p-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <app-product *ngFor="let product of products" [product]="product" class="block w-full"></app-product>
+            <app-product *ngFor="let product of products()" [product]="product" class="block w-full"></app-product>
         </div>
     </div>
 </div>

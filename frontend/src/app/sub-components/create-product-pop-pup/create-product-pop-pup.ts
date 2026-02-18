@@ -3,6 +3,7 @@ import { Component, EventEmitter, Output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Product } from '../../core/models/Product';
 import { MediaSevice } from '../../core/services/media-sevice';
+import { ProductsService } from '../../core/services/products-service';
 
 @Component({
   selector: 'app-create-product-pop-pup',
@@ -12,7 +13,7 @@ import { MediaSevice } from '../../core/services/media-sevice';
 })
 export class CreateProductPopPup {
 
-  constructor(private mediaSevice: MediaSevice) { }
+  constructor(private mediaSevice: MediaSevice, private productsService: ProductsService) { }
 
   @Output() closePopUp = new EventEmitter<any>();
 
@@ -21,7 +22,6 @@ export class CreateProductPopPup {
     description: '',
     price: 0,
     image: '',
-    userId: 'current-user-id',
   };
 
   selectedImage = signal<File | null>(null);
@@ -48,6 +48,7 @@ export class CreateProductPopPup {
     const reader = new FileReader();
     reader.onload = () => {
       this.imagePreview.set(reader.result as string);
+      this.product.image = reader.result as string;
     };
     reader.readAsDataURL(file);
 
@@ -64,14 +65,18 @@ export class CreateProductPopPup {
     const file = this.selectedImage();
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append('name', this.product.name!);
-    formData.append('description', this.product.description!);
-    formData.append('price', this.product.price!.toString());
-    formData.append('userId', this.product.userId!);
-    formData.append('image', file);
+    console.log('Submitting product with signal:', this.product);
 
-    console.log('Submitting product with signal:', formData);
+    this.productsService.createProduct(this.product).subscribe({
+      next: (res) => {
+        console.log('Product created', res);
+        this.close();
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+
     this.close();
   }
 
