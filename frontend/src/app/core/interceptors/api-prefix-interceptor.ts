@@ -16,8 +16,6 @@ export class ApiPrefixInterceptor implements HttpInterceptor {
         req: HttpRequest<any>,
         next: HttpHandler
     ): Observable<HttpEvent<any>> {
-        console.log(req.url);
-
         if (req.url.startsWith('/api/')) {
             const apiReq = req.clone({
                 url: `${this.GATEWAY_BASE_URL}${req.url}`

@@ -23,4 +23,5 @@
 </div>
 
 <!-- Create Product Popup -->
-<app-create-product-pop-pup *ngIf="isPopPupOpen" (closePopUp)="togglePopUp()"></app-create-product-pop-pup>
+<app-create-product-pop-pup *ngIf="isPopPupOpen" (createdProduct)="onProductCreated($event)"
+    (closePopUp)="togglePopUp()"></app-create-product-pop-pup>

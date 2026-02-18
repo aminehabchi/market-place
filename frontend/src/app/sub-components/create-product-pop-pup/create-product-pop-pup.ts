@@ -15,7 +15,8 @@ export class CreateProductPopPup {
 
   constructor(private mediaSevice: MediaSevice, private productsService: ProductsService) { }
 
-  @Output() closePopUp = new EventEmitter<any>();
+  @Output() closePopUp = new EventEmitter<void>();
+  @Output() createdProduct = new EventEmitter<any>();
 
   product: Partial<Product> = {
     name: '',
@@ -23,6 +24,7 @@ export class CreateProductPopPup {
     price: 0,
     image: '',
   };
+
 
   selectedImage = signal<File | null>(null);
   imagePreview = signal<string | null>(null);
@@ -65,19 +67,15 @@ export class CreateProductPopPup {
     const file = this.selectedImage();
     if (!file) return;
 
-    console.log('Submitting product with signal:', this.product);
-
     this.productsService.createProduct(this.product).subscribe({
-      next: (res) => {
-        console.log('Product created', res);
-        this.close();
+      next: (res: any) => {
+        this.createdProduct.emit(res.data);
       },
       error: (err) => {
         console.error(err);
       }
     });
-
-    this.close();
+  
   }
 
 

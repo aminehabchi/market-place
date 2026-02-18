@@ -11,5 +11,8 @@ import com.example.products.models.Product;
 @Repository
 public interface ProductRepository extends MongoRepository<Product, UUID> {
     List<Product> findByUserId(UUID customerId);
+
+    List<Product> findAllByOrderByCreatedAtDesc();
+
     void deleteByUserId(UUID userId);
 }

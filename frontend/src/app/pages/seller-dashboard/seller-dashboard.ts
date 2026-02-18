@@ -28,6 +28,11 @@ export class SellerDashboard {
     });
   }
 
+  onProductCreated(product: Product) {
+    this.products.update(current => [product, ...current]);
+    this.isPopPupOpen=false;
+  }
+
 
   public togglePopUp() {
     this.isPopPupOpen = !this.isPopPupOpen;

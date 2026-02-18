@@ -1,7 +1,7 @@
 <div class="fixed inset-0 bg-black/30 flex items-center justify-center z-50" (click)="close()">
   <!-- Modal -->
 <div
-  class="bg-white p-6 shadow-lg w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl"
+  class="bg-white p-6 m-2 shadow-lg w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl"
   (click)="$event.stopPropagation()"
 >
 
@@ -55,12 +55,12 @@
 
       <!-- Buttons -->
       <div class="flex justify-end gap-3 mt-6">
-        <button type="button" (click)="close()" class="px-4 py-2 border hover:bg-gray-100">
+        <button type="button" (click)="close()" class="px-4 py-2 cursor-pointer border hover:bg-gray-100">
           Close
         </button>
 
         <button type="submit" [disabled]="productForm.invalid || !imagePreview()"
-          class="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50">
+          class="px-4 py-2 bg-blue-600 text-white cursor-pointer hover:bg-blue-700 disabled:opacity-50">
           Create
         </button>
       </div>
