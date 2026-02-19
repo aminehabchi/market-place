@@ -39,4 +39,14 @@ export class ProductsService {
       `${this.apiUrl}/${id}`
     );
   }
+
+  updateProduct(id: string, product: Product) {
+    return this.http.put<ApiResponse<Product>>(
+      `${this.apiUrl}/${id}`,
+      product,
+      {
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+  }
 }

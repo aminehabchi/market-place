@@ -42,6 +42,12 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.success(productService.getAllProducts()));
     }
 
+    @GetMapping("/me")
+    @PermitAll
+    public ResponseEntity<ApiResponse<List<Product>>> getMyProducts() {
+        return ResponseEntity.ok(ApiResponse.success(productService.getAllProducts()));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Product>> getProduct(@PathVariable("id") UUID id) {
         Product product = this.productService.getProductById(id);
@@ -81,8 +87,9 @@ public class ProductController {
         UUID userId = UUID.randomUUID();
 
         // if (!product.getUserId().equals(userId)) {
-        //     return ResponseEntity.status(HttpStatus.FORBIDDEN)
-        //             .body(ApiResponse.error("You are not the owner of this product", HttpStatus.FORBIDDEN));
+        // return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        // .body(ApiResponse.error("You are not the owner of this product",
+        // HttpStatus.FORBIDDEN));
         // }
 
         this.productService.deleteProduct(id);
@@ -108,8 +115,9 @@ public class ProductController {
         UUID userId = UUID.randomUUID();
 
         // if (!product.getUserId().equals(userId)) {
-        //     return ResponseEntity.status(HttpStatus.FORBIDDEN)
-        //             .body(ApiResponse.error("You are not the owner of this product", HttpStatus.FORBIDDEN));
+        // return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        // .body(ApiResponse.error("You are not the owner of this product",
+        // HttpStatus.FORBIDDEN));
         // }
 
         Product updateProduct = this.productService.updateProduct(product, productDto);

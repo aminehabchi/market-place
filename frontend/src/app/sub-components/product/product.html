@@ -1,47 +1,68 @@
-<div class="max-w-sm rounded overflow-hidden shadow-lg bg-white">
-  <!-- Product Image -->
-  <div class="relative">
-    <img class="w-full h-48 object-cover" [src]="imagePreview() || product.image" [alt]="product.name" />
-    <!-- Edit button on image -->
-    <button *ngIf="isEditing" class="absolute top-2 right-2 bg-white p-1 rounded shadow hover:bg-gray-100"
+<div class="max-w-sm flex flex-col rounded-xl overflow-hidden shadow-lg bg-white border border-gray-100 h-full">
+  <div class="relative h-48 w-full bg-gray-100 flex-shrink-0">
+    <img class="w-full h-full object-cover" [src]="imagePreview() || product.image" [alt]="product.name" />
+
+    @if (isEditing) {
+    <button
+      class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-md hover:bg-white transition-all"
       (click)="fileInput.click()">
-      <i class="fa fa-upload"></i>
+      <i class="fa fa-camera text-gray-700"></i>
     </button>
     <input type="file" #fileInput class="hidden" (change)="onImageSelected($event)" accept="image/*" />
+    }
   </div>
 
-  <!-- Product Info -->
-  <div class="px-6 py-4">
-    <div *ngIf="!isEditing; else editTemplate">
-      <div class="font-bold text-xl mb-2">{{ product.name }}</div>
-      <p class="text-gray-700 text-base">{{ product.description }}</p>
-      <p class="text-indigo-600 font-bold text-lg">${{ product.price }}</p>
+  <div class="px-6 py-5 flex-grow">
+    @if (!isEditing) {
+    <div class="space-y-2">
+      <h3 class="font-bold text-xl text-gray-900 leading-tight truncate">{{ product.name }}</h3>
+      <p class="text-gray-600 text-sm line-clamp-3 h-15">{{ product.description }}</p>
+      <p class="text-indigo-600 font-extrabold text-xl pt-2">${{ product.price }}</p>
     </div>
-
-    <!-- Edit Mode -->
-    <ng-template #editTemplate>
-      <input type="text" [(ngModel)]="product.name" placeholder="Product Name" class="border rounded w-full p-2 mb-2" />
-      <textarea [(ngModel)]="product.description" placeholder="Product Description"
-        class="border rounded w-full p-2 mb-2"></textarea>
-      <input type="number" [(ngModel)]="product.price" placeholder="Price" class="border rounded w-full p-2" />
-    </ng-template>
+    } @else {
+    <div class="flex flex-col gap-3">
+      <input type="text" [(ngModel)]="updatedProduct.name"
+        class="border border-gray-300 rounded-md w-full px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none text-sm" />
+      <textarea [(ngModel)]="updatedProduct.description" rows="3"
+        class="border border-gray-300 rounded-md w-full px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none text-sm resize-none"></textarea>
+      <div class="relative">
+        <span class="absolute left-3 top-2 text-gray-500">$</span>
+        <input type="number" [(ngModel)]="updatedProduct.price"
+          class="border border-gray-300 rounded-md w-full pl-7 pr-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none text-sm" />
+      </div>
+    </div>
+    }
   </div>
 
-  <!-- Product Footer -->
-  <div class="px-6 pt-4 pb-2 flex items-center justify-between">
-    <div *ngIf="!isMyProduct">
-      <button class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500 transition duration-200">
-        Buy
+  <div class="px-6 py-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between mt-auto">
+    @if (!isMyProduct) {
+    <button
+      class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition shadow-sm active:scale-95">
+      Buy Now
+    </button>
+    }
+
+    @if (isMyProduct) {
+    <div class="flex items-center justify-end w-full space-x-5 text-lg">
+      @if (!isEditing) {
+      <button (click)="isEditing = true"
+        class="text-gray-400 hover:text-blue-600 transition-colors tooltip  cursor-pointer">
+        <i class="fa fa-pencil"></i>
       </button>
+      <button (click)="delete()" class="text-gray-400 hover:text-red-600 transition-colors  cursor-pointer">
+        <i class="fa fa-trash"></i>
+      </button>
+      } @else {
+      <button (click)="cancel()"
+        class="text-gray-400 hover:text-red-600 transition-colors cursor-pointer flex items-center gap-1 text-sm font-bold">
+        <i class="fa fa-times"></i> CANCEL
+      </button>
+      <button (click)="save()"
+        class="text-green-600 hover:text-green-700 transition-colors cursor-pointer flex items-center gap-1 text-sm font-bold">
+        <i class="fa fa-check"></i> SAVE
+      </button>
+      }
     </div>
-
-    <div *ngIf="isMyProduct" class="flex space-x-3 text-gray-600">
-      <i *ngIf="!isEditing" (click)="isEditing = true"
-        class="fa fa-pencil hover:text-blue-600 cursor-pointer transition duration-200"></i>
-      <i *ngIf="isEditing" (click)="save()"
-        class="fa fa-check hover:text-green-600 cursor-pointer transition duration-200"></i>
-      <i *ngIf="!isEditing" (click)="delete()"
-        class="fa fa-trash hover:text-red-600 cursor-pointer transition duration-200"></i>
-    </div>
+    }
   </div>
 </div>

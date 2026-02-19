@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class ProductItem {
   @Input() product!: Product;
+  updatedProduct!: Product;
   @Output() deletedProductId = new EventEmitter<string>();
 
   // Signals for image preview and selected file
@@ -23,19 +24,12 @@ export class ProductItem {
   isMyProduct: boolean = false;
   isEditing = false;
 
-  constructor(private router: Router, private producteService: ProductsService) {}
+  constructor(private router: Router, private producteService: ProductsService) { }
 
   ngOnInit() {
+    this.updatedProduct = structuredClone(this.product);
     const currentUrl = this.router.url;
     this.isMyProduct = currentUrl === '/dashboard';
-  }
-
-  save() {
-    // Here you would send updated product + selected image to backend
-    console.log('Updated product:', this.product, this.selectedImage());
-    this.isEditing = false;
-    this.selectedImage.set(null);
-    this.imagePreview.set(null);
   }
 
   onImageSelected(event: Event) {
@@ -57,12 +51,37 @@ export class ProductItem {
 
     const reader = new FileReader();
     reader.onload = () => {
-      this.imagePreview.set(reader.result as string); 
-      this.product.image = reader.result as string;
+      this.imagePreview.set(reader.result as string);
+      this.updatedProduct.image = reader.result as string;
     };
     reader.readAsDataURL(file);
 
     input.value = '';
+  }
+
+
+  save() {
+    this.producteService.updateProduct(this.product.id, this.updatedProduct).subscribe({
+      next: () => {
+        this.product = structuredClone(this.updatedProduct);
+        this.closeUpdate()
+      },
+      error: (err) => {
+        console.error('Error update product:', err);
+        alert('Failed to delete product. Please try again.');
+      },
+    });
+  }
+
+  cancel() {
+    this.updatedProduct = structuredClone(this.product);
+    this.closeUpdate()
+  }
+
+  closeUpdate() {
+    this.isEditing = false
+    this.selectedImage.set(null);
+    this.imagePreview.set(null);
   }
 
   delete() {

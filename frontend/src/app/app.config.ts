@@ -7,13 +7,11 @@ import { routes } from './app.routes';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(withInterceptorsFromDi()),
-
     {
       provide: HTTP_INTERCEPTORS,
       useClass: ApiPrefixInterceptor,
       multi: true
     },
-
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes)
   ]
