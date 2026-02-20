@@ -13,7 +13,7 @@ import com.buy01.users.DTOs.RegisterResDTOs;
 import com.buy01.users.Service.AuthService;
 
 @RestController
-@RequestMapping({"/api/auth", "/auth"})
+@RequestMapping({"/api/users", "/auth"})
 public class AuthController {
     private final AuthService authService;
 

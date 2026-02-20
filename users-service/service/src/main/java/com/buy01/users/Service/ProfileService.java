@@ -51,6 +51,6 @@ public class ProfileService {
     private User getAuthenticatedUser() {
         String authName = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByUsernameOrEmail(authName, authName)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found 1"));
     }
 }

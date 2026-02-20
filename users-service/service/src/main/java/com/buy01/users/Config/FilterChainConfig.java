@@ -24,7 +24,7 @@ public class FilterChainConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/auth/login", "/api/auth/register", "/auth/login", "/auth/register").permitAll())
+                    .requestMatchers("/api/users/login", "/api/users/register", "/users/login", "/users/register").permitAll())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.addFilterBefore(jwtFilterConfig, UsernamePasswordAuthenticationFilter.class);

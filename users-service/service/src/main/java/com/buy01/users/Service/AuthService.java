@@ -40,7 +40,7 @@ public class AuthService {
 
     public LoginResDTOs login(LoginReqDTOs req) {
         User user = userRepository.findByUsernameOrEmail(req.identification(), req.identification())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found 1"));
         if (passwordEncoder.matches(req.password(), user.password())) {
             String token = jwtUtils.generateToken(user.id(), user.role());
             return new LoginResDTOs(token, user.role(), "ok");

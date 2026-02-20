@@ -22,9 +22,9 @@ public class GatewayApplication {
             .route("products", r -> r
                 .path("/api/products/**")
                 .uri("lb://products"))
-            .route("users", r -> r
+            .route("auth", r -> r
                 .path("/api/users/**")
-                .uri("lb://usres"))
+                .uri("lb://users"))
             .build();
     }
 }
