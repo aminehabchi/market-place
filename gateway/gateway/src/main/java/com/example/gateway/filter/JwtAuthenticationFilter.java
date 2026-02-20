@@ -80,7 +80,7 @@ public class JwtAuthenticationFilter implements GlobalFilter {
             System.out.println("Seller here ======================================");
             return true;
         }
-        if (path.startsWith("/api/users/me") && role != null) {
+        if (path.startsWith("/api/users/me") && "SELLER".equals(role)) {
             return true;
         }
         if (path.startsWith("/api/seller") && "SELLER".equals(role)) {
