@@ -10,7 +10,7 @@ description = 'media service'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(25)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
@@ -18,14 +18,28 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+	set('springCloudVersion', "2025.1.0")
+}
+
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-mongodb'
+    implementation platform('com.github.paulcwarren:spring-content-bom:3.0.17') // BOM import
+    // Spring Content modules (no version needed because BOM manages it)
+    implementation 'com.github.paulcwarren:spring-content-fs'
+    implementation 'com.github.paulcwarren:spring-content-rest'
+
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-	testImplementation 'org.springframework.boot:spring-boot-starter-mongodb-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+}
+dependencyManagement {
+    imports {
+    	mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"    
+        mavenBom "com.github.paulcwarren:spring-content-bom:3.0.17"
+
+    }
 }
 
 tasks.named('test') {
