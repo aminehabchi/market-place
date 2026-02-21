@@ -38,6 +38,7 @@ services:
     volumes:
       - ./service/src:/app/src
       - ~/.gradle:/root/.gradle
+      - ~/.m2:/root/.m2
     working_dir: /app
 volumes:
   mongo_data:
