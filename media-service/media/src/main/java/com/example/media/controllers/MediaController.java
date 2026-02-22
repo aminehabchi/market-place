@@ -6,15 +6,13 @@ import com.example.media.repositories.UserRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import java.util.UUID;
 
 import com.example.media.repositories.UserAvatarContentStore;
 import com.example.media.services.UserAvatarService;
-
 
 @RestController
 @RequestMapping("/api/media")
@@ -25,8 +23,8 @@ public class MediaController {
     private final UserAvatarContentStore contentStore;
 
     public MediaController(UserAvatarService userAvatarService,
-                           UserRepository repository,
-                           UserAvatarContentStore contentStore) {
+            UserRepository repository,
+            UserAvatarContentStore contentStore) {
         this.userAvatarService = userAvatarService;
         this.repository = repository;
         this.contentStore = contentStore;
@@ -37,11 +35,12 @@ public class MediaController {
     // =======================
     @PostMapping("/avatar")
     public ResponseEntity<UUID> uploadAvatar(
-            @RequestParam("file") MultipartFile file
-    ) throws IOException {
+            @RequestBody byte[] fileBytes,
+            @RequestHeader("Content-Type") String mimeType) throws Exception {
 
-        UserAvatar avatar =
-                userAvatarService.uploadAvatar(file.getInputStream());
+        UserAvatar avatar = userAvatarService.uploadAvatar(
+                new ByteArrayInputStream(fileBytes),
+                mimeType);
 
         return ResponseEntity.ok(avatar.getId());
     }
