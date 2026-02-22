@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -12,8 +12,11 @@ import { LoginService } from '../login/loginService';
 })
 export class Register {
   message = '';
-  errorMessage = '';
+  // errorMessage = '';
   isSubmitting = false;
+  errorMessage = signal({ msg: '', isthere: false })
+  // errorMessage = { msg: '', isthere: false };
+
   user = {
     email: '',
     name: '',
@@ -30,14 +33,13 @@ export class Register {
     }
 
     if (this.user.password !== this.user.confirmPassword) {
-      this.errorMessage = 'Passwords do not match.';
+      // this.errorMessage = 'Passwords do not match.';
       this.message = '';
       return;
     }
 
     this.isSubmitting = true;
     this.message = '';
-    this.errorMessage = '';
 
     this.loginService.registerUser({
       email: this.user.email,
@@ -55,12 +57,21 @@ export class Register {
           confirmPassword: '',
           role: 'GUEST'
         });
+        // this.errorMessage.isthere = false;
+        this.errorMessage.update((b) => {
+          b.isthere = false;
+          b.msg = '';
+          return b;
+        });
+        // this.errorMessage.msg = "";
+
       },
       error: (err) => {
-        this.errorMessage = err?.error?.message || err?.error?.msg || 'Registration failed. Please try again.';
+        this.errorMessage.set({ msg: err.error.message, isthere: true });
+        // console.error("whyyyyyyyy ", err.error.message);
         this.isSubmitting = false;
+        // console.error(this.errorMessage.msg);
       }
     });
   }
-
 }
