@@ -9,13 +9,16 @@
 
       <!-- Desktop Menu -->
       <div class="hidden md:flex md:items-center md:space-x-4">
+        @if (areWeLoggedIn()) {
         <a routerLink="/login" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
           Login
         </a>
 
-        <a routerLink="/register" class="text-indigo-600 hover:text-indigo-700 border border-indigo-200 px-3 py-2 rounded-md text-sm font-semibold bg-indigo-50">
+        <a routerLink="/register"
+          class="text-indigo-600 hover:text-indigo-700 border border-indigo-200 px-3 py-2 rounded-md text-sm font-semibold bg-indigo-50">
           Register
         </a>
+        }
 
         <!-- Dashboard Button -->
         <a routerLink="/dashboard" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
@@ -30,14 +33,13 @@
 
       <!-- Mobile menu button -->
       <div class="flex items-center md:hidden">
-        <button (click)="toggleMenu()" class="text-gray-700 hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <button (click)="toggleMenu()"
+          class="text-gray-700 hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
           <svg *ngIf="!isOpen" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
           <svg *ngIf="isOpen" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
         </button>
       </div>
@@ -47,9 +49,13 @@
 
   <!-- Mobile Menu -->
   <div *ngIf="isOpen" class="md:hidden bg-white px-2 pt-2 pb-3 space-y-1 shadow-md">
-    <a routerLink="/login" class="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Login</a>
-    <a routerLink="/register" class="block text-indigo-600 hover:text-indigo-700 px-3 py-2 rounded-md text-sm font-medium">Register</a>
-    <a routerLink="/dashboard" class="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-    <a routerLink="/profile" class="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Profile</a>
+    <a routerLink="/login"
+      class="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Login</a>
+    <a routerLink="/register"
+      class="block text-indigo-600 hover:text-indigo-700 px-3 py-2 rounded-md text-sm font-medium">Register</a>
+    <a routerLink="/dashboard"
+      class="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+    <a routerLink="/profile"
+      class="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Profile</a>
   </div>
 </nav>

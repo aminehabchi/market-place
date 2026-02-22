@@ -19,7 +19,7 @@ export class Register {
     username: '',
     password: '',
     confirmPassword: '',
-    role: 'ROLE_GUEST'
+    role: 'GUEST'
   };
 
   constructor(private loginService: LoginService) { }
@@ -53,7 +53,7 @@ export class Register {
           username: '',
           password: '',
           confirmPassword: '',
-          role: 'ROLE_GUEST'
+          role: 'GUEST'
         });
       },
       error: (err) => {
