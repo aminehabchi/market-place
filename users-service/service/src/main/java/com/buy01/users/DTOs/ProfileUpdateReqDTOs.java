@@ -1,7 +1,7 @@
 package com.buy01.users.DTOs;
 
 public record ProfileUpdateReqDTOs(
-        String username,
+        String name,
         String email,
         String avatarUrl) {
 }

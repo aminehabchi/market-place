@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Document
 public record User(
         @Id String id,
-        String username,
+        String name,
         String email,
         @JsonIgnore String password,
         String role,

@@ -16,7 +16,7 @@ export class Register {
   isSubmitting = false;
   user = {
     email: '',
-    username: '',
+    name: '',
     password: '',
     confirmPassword: '',
     role: 'GUEST'
@@ -41,7 +41,7 @@ export class Register {
 
     this.loginService.registerUser({
       email: this.user.email,
-      username: this.user.username,
+      name: this.user.name,
       password: this.user.password,
       role: this.user.role
     }).subscribe({
@@ -50,7 +50,7 @@ export class Register {
         this.isSubmitting = false;
         form.resetForm({
           email: '',
-          username: '',
+          name: '',
           password: '',
           confirmPassword: '',
           role: 'GUEST'

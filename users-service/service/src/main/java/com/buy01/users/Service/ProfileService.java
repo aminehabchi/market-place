@@ -19,13 +19,13 @@ public class ProfileService {
 
     public ProfileResDTOs getCurrentProfile() {
         User user = getAuthenticatedUser();
-        return new ProfileResDTOs(user.id(), user.username(), user.email(), user.role(), user.avatarUrl());
+        return new ProfileResDTOs(user.id(), user.name(), user.email(), user.role(), user.avatarUrl());
     }
 
     public ProfileResDTOs updateCurrentProfile(ProfileUpdateReqDTOs req) {
         User user = getAuthenticatedUser();
 
-        String updatedUsername = req.username() == null || req.username().isBlank() ? user.username() : req.username();
+        String updatedName = req.name() == null || req.name().isBlank() ? user.name() : req.name();
         String updatedEmail = req.email() == null || req.email().isBlank() ? user.email() : req.email();
         String updatedAvatarUrl = user.avatarUrl();
 
@@ -38,19 +38,19 @@ public class ProfileService {
 
         User updated = new User(
                 user.id(),
-                updatedUsername,
+                updatedName,
                 updatedEmail,
                 user.password(),
                 user.role(),
                 updatedAvatarUrl);
 
         userRepository.save(updated);
-        return new ProfileResDTOs(updated.id(), updated.username(), updated.email(), updated.role(), updated.avatarUrl());
+        return new ProfileResDTOs(updated.id(), updated.name(), updated.email(), updated.role(), updated.avatarUrl());
     }
 
     private User getAuthenticatedUser() {
         String authName = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByUsernameOrEmail(authName, authName)
+        return userRepository.findByEmail(authName)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found 1"));
     }
 }

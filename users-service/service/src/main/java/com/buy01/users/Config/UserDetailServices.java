@@ -24,7 +24,7 @@ public class UserDetailServices implements UserDetailsService {
     public UserDetails loadUserByUsername(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not Found 1"));
-        String username = user.username();
+        String username = user.id();
         // String email = user.email();
         String password = user.password();
         List<SimpleGrantedAuthority> roles = new ArrayList<>();
