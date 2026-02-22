@@ -1,1 +1,84 @@
-<p>register works!</p>
+<section class="auth-shell">
+	<div class="auth-card">
+		<div class="auth-branding">
+			<h1>Create your account</h1>
+			<p>Join E-Buy and start browsing or selling products.</p>
+		</div>
+
+		<form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)" class="auth-form" novalidate>
+			<div class="field-group">
+				<label for="email">Email</label>
+				<input
+					id="email"
+					name="email"
+					type="email"
+					[(ngModel)]="user.email"
+					required
+					email
+					placeholder="you@example.com" />
+			</div>
+
+			<div class="field-group">
+				<label for="username">Username</label>
+				<input
+					id="username"
+					name="username"
+					type="text"
+					[(ngModel)]="user.username"
+					required
+					minlength="3"
+					placeholder="your_username" />
+			</div>
+
+			<div class="field-group">
+				<label for="password">Password</label>
+				<input
+					id="password"
+					name="password"
+					type="password"
+					[(ngModel)]="user.password"
+					required
+					minlength="6"
+					placeholder="••••••••" />
+			</div>
+
+			<div class="field-group">
+				<label for="confirmPassword">Confirm password</label>
+				<input
+					id="confirmPassword"
+					name="confirmPassword"
+					type="password"
+					[(ngModel)]="user.confirmPassword"
+					required
+					minlength="6"
+					placeholder="••••••••" />
+			</div>
+
+			<div class="field-group">
+				<label for="role">Account type</label>
+				<select id="role" name="role" [(ngModel)]="user.role" required>
+					<option value="ROLE_GUEST">Guest</option>
+					<option value="ROLE_BUYER">Buyer</option>
+					<option value="ROLE_SELLER">Seller</option>
+				</select>
+			</div>
+
+			<button type="submit" [disabled]="isSubmitting || registerForm.invalid">
+				{{ isSubmitting ? 'Creating account...' : 'Register' }}
+			</button>
+		</form>
+
+		@if (message) {
+			<p class="feedback success">{{ message }}</p>
+		}
+
+		@if (errorMessage) {
+			<p class="feedback error">{{ errorMessage }}</p>
+		}
+
+		<p class="auth-footer">
+			Already have an account?
+			<a routerLink="/login">Sign in</a>
+		</p>
+	</div>
+</section>

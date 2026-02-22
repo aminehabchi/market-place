@@ -9,6 +9,14 @@
 
       <!-- Desktop Menu -->
       <div class="hidden md:flex md:items-center md:space-x-4">
+        <a routerLink="/login" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
+          Login
+        </a>
+
+        <a routerLink="/register" class="text-indigo-600 hover:text-indigo-700 border border-indigo-200 px-3 py-2 rounded-md text-sm font-semibold bg-indigo-50">
+          Register
+        </a>
+
         <!-- Dashboard Button -->
         <a routerLink="/dashboard" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
           Dashboard
@@ -39,6 +47,8 @@
 
   <!-- Mobile Menu -->
   <div *ngIf="isOpen" class="md:hidden bg-white px-2 pt-2 pb-3 space-y-1 shadow-md">
+    <a routerLink="/login" class="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Login</a>
+    <a routerLink="/register" class="block text-indigo-600 hover:text-indigo-700 px-3 py-2 rounded-md text-sm font-medium">Register</a>
     <a routerLink="/dashboard" class="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
     <a routerLink="/profile" class="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Profile</a>
   </div>
