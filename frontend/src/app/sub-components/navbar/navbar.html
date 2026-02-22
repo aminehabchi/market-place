@@ -9,7 +9,7 @@
 
       <!-- Desktop Menu -->
       <div class="hidden md:flex md:items-center md:space-x-4">
-        @if (areWeLoggedIn()) {
+        @if (!isAuthenticated()) {
         <a routerLink="/login" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
           Login
         </a>
@@ -18,6 +18,11 @@
           class="text-indigo-600 hover:text-indigo-700 border border-indigo-200 px-3 py-2 rounded-md text-sm font-semibold bg-indigo-50">
           Register
         </a>
+        } @else {
+        <button (click)="logout()"
+          class="text-red-600 hover:text-red-700 border border-red-200 px-3 py-2 rounded-md text-sm font-semibold bg-red-50 cursor-pointer">
+          Logout
+        </button>
         }
 
         <!-- Dashboard Button -->
@@ -49,10 +54,15 @@
 
   <!-- Mobile Menu -->
   <div *ngIf="isOpen" class="md:hidden bg-white px-2 pt-2 pb-3 space-y-1 shadow-md">
+    @if (!isAuthenticated()) {
     <a routerLink="/login"
       class="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Login</a>
     <a routerLink="/register"
       class="block text-indigo-600 hover:text-indigo-700 px-3 py-2 rounded-md text-sm font-medium">Register</a>
+    } @else {
+    <button (click)="logout()"
+      class="block w-full text-left text-red-600 hover:text-red-700 px-3 py-2 rounded-md text-sm font-medium">Logout</button>
+    }
     <a routerLink="/dashboard"
       class="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
     <a routerLink="/profile"

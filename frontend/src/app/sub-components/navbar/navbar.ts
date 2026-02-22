@@ -1,6 +1,6 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, Inject, PLATFORM_ID } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -10,22 +10,31 @@ import { RouterModule } from '@angular/router';
 })
 export class Navbar {
   isOpen = false;
-  token: String | null = '';
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-  }
+  constructor(
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: object
+  ) {}
 
   toggleMenu() {
     this.isOpen = !this.isOpen;
   }
 
-  areWeLoggedIn(): boolean {
+  isAuthenticated(): boolean {
     if (isPlatformBrowser(this.platformId)) {
-      this.token = localStorage.getItem('token');
-      if (this.token == null) {
-        return true
-      }
-      return false;
+      return !!localStorage.getItem('token');
     }
-    return true;
+
+    return false;
+  }
+
+  logout(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    this.isOpen = false;
+    this.router.navigateByUrl('/login');
   }
 }
