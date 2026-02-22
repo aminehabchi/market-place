@@ -11,13 +11,15 @@ import java.nio.file.Files;
 
 @Configuration
 @EnableFilesystemStores
-public class ApplicationConfig {
+public class ContentConfig {
 
     // Temporary folder for storing files (you can change to a fixed path)
     @Bean
     public File filesystemRoot() {
         try {
-            return Files.createTempDirectory("spring-content").toFile();
+            File dir = Files.createTempDirectory("spring-content").toFile();
+            System.out.println("Spring Content directory: " + dir.getAbsolutePath());
+            return dir;
         } catch (IOException ioe) {
             throw new RuntimeException("Failed to create temp directory", ioe);
         }

@@ -2,7 +2,7 @@ package com.example.media.services;
 
 import com.example.media.models.UserAvatar;
 import com.example.media.repositories.*;
-
+import com.example.media.stores.UserAvatarContentStore;
 
 import org.springframework.stereotype.Service;
 
@@ -21,17 +21,17 @@ public class UserAvatarService {
         this.contentStore = contentStore;
     }
 
-    // ✅ Updated method
+    // Updated method
     public UserAvatar uploadAvatar(InputStream inputStream, String mimeType) throws Exception {
-        // 1️⃣ Create metadata
+        // Create metadata
         UserAvatar avatar = new UserAvatar();
         avatar.setId(UUID.randomUUID());
         avatar.setMimeType(mimeType);
 
-        // 2️⃣ Save metadata first
+        // Save metadata first
         avatar = repository.save(avatar);
 
-        // 3️⃣ Save actual file bytes to filesystem via Spring Content
+        // Save actual file bytes to filesystem via Spring Content
         contentStore.setContent(avatar, inputStream);
 
    

@@ -11,18 +11,18 @@ import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.util.UUID;
 
-import com.example.media.repositories.UserAvatarContentStore;
 import com.example.media.services.UserAvatarService;
+import com.example.media.stores.UserAvatarContentStore;
 
 @RestController
-@RequestMapping("/api/media")
-public class MediaController {
+@RequestMapping("/api/media/users")
+public class UserController {
 
     private final UserAvatarService userAvatarService;
     private final UserRepository repository;
     private final UserAvatarContentStore contentStore;
 
-    public MediaController(UserAvatarService userAvatarService,
+    public UserController(UserAvatarService userAvatarService,
             UserRepository repository,
             UserAvatarContentStore contentStore) {
         this.userAvatarService = userAvatarService;
@@ -30,10 +30,7 @@ public class MediaController {
         this.contentStore = contentStore;
     }
 
-    // =======================
-    // UPLOAD AVATAR
-    // =======================
-    @PostMapping("/avatar")
+    @PostMapping("/")
     public ResponseEntity<UUID> uploadAvatar(
             @RequestBody byte[] fileBytes,
             @RequestHeader("Content-Type") String mimeType) throws Exception {
@@ -45,10 +42,8 @@ public class MediaController {
         return ResponseEntity.ok(avatar.getId());
     }
 
-    // =======================
-    // SERVE AVATAR
-    // =======================
-    @GetMapping("/avatar/{id}")
+
+    @GetMapping("/{id}")
     public ResponseEntity<byte[]> getAvatar(@PathVariable UUID id)
             throws Exception {
 

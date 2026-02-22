@@ -1,4 +1,4 @@
-package com.example.media.repositories;
+package com.example.media.stores;
 
 import org.springframework.content.fs.store.FilesystemContentStore;
 

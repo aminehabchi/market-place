@@ -12,7 +12,7 @@ import org.springframework.content.commons.annotations.MimeType;
 import lombok.Data;
 
 @Data
-@Document(collection = "users_files")
+@Document(collection = "users_avatars")
 public class UserAvatar {
     @Id
     private UUID id;
