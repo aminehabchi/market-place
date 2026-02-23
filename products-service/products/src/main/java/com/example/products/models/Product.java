@@ -1,6 +1,5 @@
 package com.example.products.models;
 
-import java.util.UUID;
 
 import com.example.shared.common.database.BaseEntity;
 
@@ -29,12 +28,14 @@ public class Product extends BaseEntity {
 
     private double price;
 
+    private long quantity;
+
     private String image;
 
     @Field("userId")
-    private UUID userId;
+    private String userId;
 
-    public Product(CreateProdutDto dto, UUID userId) {
+    public Product(CreateProdutDto dto, String userId) {
         this.name = dto.getName();
         this.description = dto.getDescription();
         this.price = dto.getPrice();

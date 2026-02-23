@@ -26,7 +26,7 @@ public class ProductService {
         return productRepository.findById(id).orElse(null);
     }
 
-    public Product createProduct(CreateProdutDto productDto, UUID userId) {
+    public Product createProduct(CreateProdutDto productDto, String userId) {
         Product product = new Product(productDto, userId);
 
         return productRepository.save(product);

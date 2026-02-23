@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductItem } from '../../sub-components/product/product';
 import { CreateProductPopPup } from '../../sub-components/create-product-pop-pup/create-product-pop-pup';
-import { Product, products } from '../../core/models/Product';
+import { Product } from '../../core/models/Product';
 import { ProductsService } from '../../core/services/products-service';
 @Component({
   selector: 'app-seller-dashboard',

@@ -24,7 +24,7 @@ export class ProductsService {
 
   getAllProducts(): Observable<ApiResponse<Product[]>> {
     return this.http.get<ApiResponse<Product[]>>(
-      `${this.apiUrl}/`
+      `${this.apiUrl}`
     );
   }
 
