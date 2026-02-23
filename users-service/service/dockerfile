@@ -6,4 +6,5 @@ RUN gradle dependencies
 
 COPY src ./src
 
+EXPOSE 8080
 CMD ["bash", "-c", "gradle bootRun & gradle classes --continuous"]

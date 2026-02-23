@@ -19,6 +19,7 @@ services:
     ports:
       - "8888:8888"
     environment:
+      SPRING_APPLICATION_NAME: media
       SPRING_DATA_MONGODB_URI: mongodb://amine:1234@media-service-mongodb:27017/DB?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       DISCOVERY : http://eureka-server:8761/eureka

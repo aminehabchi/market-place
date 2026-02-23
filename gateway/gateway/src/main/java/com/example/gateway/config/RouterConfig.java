@@ -15,7 +15,7 @@ public class RouterConfig {
                         .uri("lb://products"))
                 .route("users", r -> r
                         .path("/api/users/**")
-                        .uri("lb://usres"))
+                        .uri("lb://users"))
                 .build();
     }
 }

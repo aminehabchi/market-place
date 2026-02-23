@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { env } from '../../../env/env'
 
 export interface LoginPayload {
     identification: string;
@@ -33,11 +32,11 @@ export class LoginService {
     constructor(private http: HttpClient) { }
 
     loginUser(userData: LoginPayload): Observable<LoginResponse> {
-        return this.http.post<LoginResponse>(env.apiUrl + this.loginPath, userData);
+        return this.http.post<LoginResponse>(this.loginPath, userData);
     }
 
     registerUser(userData: RegisterPayload): Observable<RegisterResponse> {
-        return this.http.post<RegisterResponse>(env.apiUrl + this.registerPath, userData);
+        return this.http.post<RegisterResponse>(this.registerPath, userData);
     }
 
     logeUser(userData: LoginPayload): Observable<LoginResponse> {
