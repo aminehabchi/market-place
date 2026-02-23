@@ -1,5 +1,0 @@
-{
-    "java.compile.nullAnalysis.mode": "automatic",
-    "java.home": "/usr/lib/jvm/java-21-openjdk-amd64",
-    "java.configuration.updateBuildConfiguration": "interactive"
-}

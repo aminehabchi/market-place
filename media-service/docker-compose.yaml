@@ -12,9 +12,9 @@ services:
       - shared-net
 
   media-service:
-    build: 
-      context: ./service
-    restart: on-failure
+    build:
+      context: ../
+      dockerfile: ./media-service/media/Dockerfile
     container_name: media-service
     ports:
       - "8888:8888"
@@ -22,16 +22,17 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb://amine:1234@media-service-mongodb:27017/DB?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       DISCOVERY : http://eureka-server:8761/eureka
+    depends_on:
+      - media-service-mongodb
+    volumes:
+      - media_m2:/root/.m2
     networks:
       - shared-net
-    depends_on:
-        - media-service-mongodb
-    volumes:
-      - ./service/src:/app/src
-      - ~/.gradle:/root/.gradle
-    working_dir: /app
+
 volumes:
   mongo_data:
+  media_m2:
+
 networks:
   shared-net:
     external: true
