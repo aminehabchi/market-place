@@ -1,1 +1,39 @@
-<p>login works!</p>
+<section class="auth-shell">
+    <div class="auth-card">
+        <div class="auth-branding">
+            <h1>Welcome back</h1>
+            <p>Sign in to continue shopping on E-Buy.</p>
+        </div>
+
+        <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)" class="auth-form" novalidate>
+            <div class="field-group">
+                <label for="identification">Username or email</label>
+                <input id="identification" name="identification" type="text" [(ngModel)]="user.identification" required
+                    minlength="3" placeholder="yourname@example.com" />
+            </div>
+
+            <div class="field-group">
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password" [(ngModel)]="user.password" required minlength="6"
+                    placeholder="••••••••" />
+            </div>
+
+            <button type="submit" [disabled]="isSubmitting || loginForm.invalid">
+                {{ isSubmitting ? 'Signing in...' : 'Login' }}
+            </button>
+        </form>
+
+        @if (message) {
+        <p class="feedback success">{{ message }}</p>
+        }
+
+        @if (errorMessage) {
+        <p class="feedback error">{{ errorMessage }}</p>
+        }
+
+        <p class="auth-footer">
+            Don't have an account?
+            <a routerLink="/register">Create one</a>
+        </p>
+    </div>
+</section>

@@ -23,8 +23,8 @@ public class UserDetailServices implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User not Found"));
-        String username = user.username();
+                .orElseThrow(() -> new UsernameNotFoundException("User not Found 1"));
+        String username = user.id();
         // String email = user.email();
         String password = user.password();
         List<SimpleGrantedAuthority> roles = new ArrayList<>();

@@ -9,5 +9,7 @@ import com.buy01.users.Entity.User;
 
 @Repository
 public interface UserRepository extends MongoRepository<User, String> {
-    Optional<User> findByUsernameOrEmail(String username, String email);
+    Optional<User> findByEmail(String email);
+
+    boolean existsByEmail(String email);
 }

@@ -35,14 +35,18 @@ public class JwtFilterConfig extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        final String authorizationHeader = request.getHeader("Authorization");
-        String authSub = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String token = authorizationHeader.substring(7);
-            authSub = jwtUtils.extractUsername(token);
-        }
-        if (authSub != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userdetails = userDetailServices.loadUserByUsername(authSub);
+        final String xUserId = request.getHeader("X-User-Id");
+        final String xUserRole = request.getHeader("X-User-Role");
+
+        // final String authorizationHeader = request.getHeader("Authorization");
+
+        // String authSub = null;
+        // if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+        //     String token = authorizationHeader.substring(7);
+        //     // authSub = jwtUtils.extractUsername(token);
+        // }
+        if (xUserId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userdetails = userDetailServices.loadUserByUsername(xUserId);
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                     userdetails, null, userdetails.getAuthorities());
             usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

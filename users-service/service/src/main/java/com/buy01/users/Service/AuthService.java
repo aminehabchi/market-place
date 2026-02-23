@@ -13,7 +13,9 @@ import com.buy01.users.Entity.User;
 import com.buy01.users.Repository.UserRepository;
 import com.buy01.users.Utils.JwtUtils;
 import org.springframework.kafka.core.KafkaTemplate;
-
+import com.example.shared.common.kafkaDtos.KafkaUserCreatedEvent;
+import com.example.shared.common.types.Role;
+import com.buy01.users.Exceptions.UserExistException;
 @Service
 public class AuthService {
     private final UserRepository userRepository;
@@ -30,17 +32,23 @@ public class AuthService {
     }
 
     public RegisterResDTOs register(RegisterReqDTOs req) {
-        String role = normalizeRole(req.role());
-        User user = new User(null, req.username(), req.email(), passwordEncoder.encode(req.password()), role, null);
+        Role role = normalizeRole(req.role());
+        boolean exist = userRepository.existsByEmail(req.email());
+        if (exist) {
+            throw new UserExistException("Invalid Email");
+        }
+        User user = new User(null, req.name(), req.email(), passwordEncoder.encode(req.password()),
+                role.toString().substring(5), null);
+        System.out.println("name ==================== " + req.name());
         userRepository.save(user);
-        UserCreatedEvent event = new UserCreatedEvent(user.id(), user.email(), user.username());
-        kafkaTemplate.send("user-events", user.id(), event);
+        KafkaUserCreatedEvent event = new KafkaUserCreatedEvent(null, user.email(), user.name());
+        kafkaTemplate.send("create-user-events", null, event);
         return new RegisterResDTOs("user created");
     }
 
     public LoginResDTOs login(LoginReqDTOs req) {
-        User user = userRepository.findByUsernameOrEmail(req.identification(), req.identification())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = userRepository.findByEmail(req.identification())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found 1"));
         if (passwordEncoder.matches(req.password(), user.password())) {
             String token = jwtUtils.generateToken(user.id(), user.role());
             return new LoginResDTOs(token, user.role(), "ok");
@@ -48,14 +56,20 @@ public class AuthService {
         throw new UsernameNotFoundException("Invalid credentials");
     }
 
-    private String normalizeRole(String role) {
-        if (role == null || role.isBlank()) {
-            return "CLIENT";
+    private Role normalizeRole(String roleInput) {
+        if (roleInput == null || roleInput.isBlank()) {
+            return Role.ROLE_BUYER;
         }
-        String normalized = role.trim().toUpperCase();
-        if (!normalized.equals("CLIENT") && !normalized.equals("SELLER")) {
-            throw new IllegalArgumentException("Invalid role. Use CLIENT or SELLER");
-        }
-        return normalized;
+
+        String normalized = roleInput.trim().toUpperCase();
+
+        return switch (normalized) {
+            case "CLIENT", "BUYER" -> Role.ROLE_BUYER;
+            case "SELLER" -> Role.ROLE_SELLER;
+            case "ADMIN" -> Role.ROLE_ADMIN;
+            case "GUEST" -> Role.ROLE_GUEST;
+            default -> throw new IllegalArgumentException(
+                    "Invalid role. Use CLIENT or SELLER");
+        };
     }
 }

@@ -12,4 +12,16 @@ public class GatewayApplication {
     public static void main(String[] args) {
         SpringApplication.run(GatewayApplication.class, args);
     }
+
+    @Bean
+    public RouteLocator routerBuilder(RouteLocatorBuilder builder) {
+        return builder.routes()
+            .route("products", r -> r
+                .path("/api/products/**")
+                .uri("lb://products"))
+            .route("auth", r -> r
+                .path("/api/users/**")
+                .uri("lb://users"))
+            .build();
+    }
 }

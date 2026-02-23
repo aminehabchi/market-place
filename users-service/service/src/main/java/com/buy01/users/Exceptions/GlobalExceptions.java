@@ -90,6 +90,15 @@ public class GlobalExceptions {
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
+        @ExceptionHandler(UserExistException.class)
+        public ResponseEntity<ApiResponseUtils<String>> handleUserExistException(
+                        UserExistException ex) {
+                ApiResponseUtils<String> response = ApiResponseUtils.error(
+                                ex.getMessage(),
+                                HttpStatus.CONFLICT);
+                return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+        }
+
         @ExceptionHandler(HttpMessageNotReadableException.class)
         public ResponseEntity<ApiResponseUtils<String>> handleHttpMessageNotReadableException(
                         HttpMessageNotReadableException ex) {
