@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { LoginService } from '../login/loginService';
+import { UsersService } from '../../core/services/users-service';
 
 @Component({
   selector: 'app-register',
@@ -24,7 +24,7 @@ export class Register {
     role: 'GUEST'
   };
 
-  constructor(private loginService: LoginService) { }
+  constructor(private loginService: UsersService) { }
 
   onAvatarSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
