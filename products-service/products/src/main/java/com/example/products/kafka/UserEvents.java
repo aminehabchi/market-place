@@ -3,22 +3,21 @@ package com.example.products.kafka;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-
-import com.example.shared.common.kafkaDtos.KafkaUserCreatedEvent;
-import com.example.shared.common.kafkaDtos.KafkaUserUpdatedEvent;
-import com.example.shared.common.kafkaDtos.KafkaUserRemovedEvent;
+import com.example.shared.common.kafka.dtos.users.KafkaUserCreatedEvent;
+import com.example.shared.common.kafka.dtos.users.KafkaUserUpdatedEvent;
+import com.example.shared.common.kafka.dtos.users.KafkaUserRemovedEvent;
 
 import com.example.products.services.UsersService;
 
 import jakarta.annotation.PostConstruct;
 
-
 @Service
 public class UserEvents {
+
     private final UsersService usersService;
 
-    public UserEvents(UsersService usersService){
-        this.usersService=usersService;
+    public UserEvents(UsersService usersService) {
+        this.usersService = usersService;
     }
 
     @KafkaListener(topics = "create-user-events", groupId = "products-group")
@@ -46,10 +45,5 @@ public class UserEvents {
         System.out.println("==============================================");
 
         this.usersService.deleteUser(object);
-    }
-
-    @PostConstruct
-    public void init() {
-        System.out.println("Kafka consumer bean initialized, ready to receive messages.");
     }
 }
