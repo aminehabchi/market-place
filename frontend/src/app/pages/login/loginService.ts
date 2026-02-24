@@ -37,7 +37,28 @@ export class LoginService {
     }
 
     registerUser(userData: RegisterPayload): Observable<RegisterResponse> {
-        return this.http.post<RegisterResponse>(env.apiUrl + this.registerPath, userData);
+        const formData = new FormData();
+        const infoBlob = new Blob([JSON.stringify(userData)], {
+            type: 'application/json'
+        });
+
+        formData.append('info', infoBlob);
+
+        return this.http.post<RegisterResponse>(env.apiUrl + this.registerPath, formData);
+    }
+
+    registerUserWithAvatar(userData: RegisterPayload, avatar?: File | null): Observable<RegisterResponse> {
+        const formData = new FormData();
+        const infoBlob = new Blob([JSON.stringify(userData)], {
+            type: 'application/json'
+        });
+
+        formData.append('info', infoBlob);
+        if (avatar) {
+            formData.append('avatar', avatar, avatar.name);
+        }
+
+        return this.http.post<RegisterResponse>(env.apiUrl + this.registerPath, formData);
     }
 
     logeUser(userData: LoginPayload): Observable<LoginResponse> {
