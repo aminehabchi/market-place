@@ -3,27 +3,32 @@ package com.example.media.kafka;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import com.example.shared.common.kafkaDtos.KafkaproductCreatedEvent;
-import com.example.shared.common.kafkaDtos.KafkaproductRemovedEvent;
+import com.example.media.services.ProductImageService;
+import com.example.media.services.ProductService;
+import com.example.shared.common.kafka.dtos.products.KafkaProductCreatedEvent;
+import com.example.shared.common.kafka.dtos.products.KafkaProductRemovedEvent;
 
 @Service
 public class ProductEvents {
-     private final productService productService;
 
-    public productEvents(productService productService) {
-        this.productService = productsService;
+    private final ProductService productService;
+    private final ProductImageService productImageService;
+
+    public ProductEvents(ProductService productService, ProductImageService productImageService) {
+        this.productService = productService;
+        this.productImageService = productImageService;
     }
 
     @KafkaListener(topics = "create-product-events", groupId = "media-group")
-    public void listenCreateproduct(KafkaproductCreatedEvent object) {
-
-        this.productsService.createproduct(object);
+    public void listenCreateproduct(KafkaProductCreatedEvent object) {
+        this.productService.createProduct(object);
     }
 
-    
     @KafkaListener(topics = "remove-product-events", groupId = "media-group")
-    public void listenRemoveproduct(KafkaproductRemovedEvent object) {
+    public void listenRemoveproduct(KafkaProductRemovedEvent object) {
 
-        this.productsService.deleteProduct(object);
+        this.productImageService.deleteProductImageByProductId(object.id());
+
+        this.productService.deleteProduct(object);
     }
 }

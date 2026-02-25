@@ -2,21 +2,20 @@ package com.example.media.services;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
 import com.example.media.models.ProductImage;
-import com.example.media.repositories.ProductRepository;
+import com.example.media.repositories.ProductImageRepository;
 import com.example.media.stores.ProductimageContentStore;
 
 @Service
-public class ProductImageSrvice {
-    private final ProductRepository repository;
+public class ProductImageService {
+    private final ProductImageRepository repository;
     private final ProductimageContentStore contentStore;
 
-    public ProductImageSrvice(ProductRepository repository,
+    public ProductImageService(ProductImageRepository repository,
             ProductimageContentStore contentStore) {
         this.repository = repository;
         this.contentStore = contentStore;
@@ -43,10 +42,15 @@ public class ProductImageSrvice {
         ProductImage image = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Image not found"));
 
-        // 1️⃣ Delete binary content (file)
+        //  Delete binary content (file)
         contentStore.unsetContent(image);
 
-        // 2️⃣ Delete metadata (DB row)
+        // Delete metadata (DB row)
         repository.delete(image);
+    }
+
+
+    public void deleteProductImageByProductId(UUID id){
+
     }
 }

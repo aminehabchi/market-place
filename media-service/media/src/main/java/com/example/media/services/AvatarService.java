@@ -1,22 +1,22 @@
 package com.example.media.services;
 
-import com.example.media.models.UserAvatar;
-import com.example.media.repositories.*;
-import com.example.media.stores.UserAvatarContentStore;
-
-import org.springframework.stereotype.Service;
-
 import java.io.InputStream;
 import java.util.UUID;
 
-@Service
-public class UserAvatarService {
+import org.springframework.stereotype.Service;
 
-    private final UserRepository repository;
+import com.example.media.models.UserAvatar;
+import com.example.media.repositories.AvatarRepository;
+import com.example.media.stores.UserAvatarContentStore;
+
+@Service
+public class AvatarService {
+
+    private final AvatarRepository repository;
     private final UserAvatarContentStore contentStore;
 
-    public UserAvatarService(UserRepository repository,
-                             UserAvatarContentStore contentStore) {
+    public AvatarService(AvatarRepository repository,
+            UserAvatarContentStore contentStore) {
         this.repository = repository;
         this.contentStore = contentStore;
     }
@@ -34,9 +34,12 @@ public class UserAvatarService {
         // Save actual file bytes to filesystem via Spring Content
         contentStore.setContent(avatar, inputStream);
 
-   
         repository.save(avatar);
 
         return avatar;
+    }
+
+    public void deleteAvatarByUserId(String userId) {
+
     }
 }

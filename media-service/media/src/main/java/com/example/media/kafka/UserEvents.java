@@ -3,36 +3,31 @@ package com.example.media.kafka;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import com.example.media.services.AvatarService;
+import com.example.media.services.UserService;
 import com.example.shared.common.kafka.dtos.users.KafkaUserCreatedEvent;
 import com.example.shared.common.kafka.dtos.users.KafkaUserRemovedEvent;
-
-
-import jakarta.annotation.PostConstruct;
 
 @Service
 public class UserEvents {
 
-    private final UsersService usersService;
+    private final UserService usersService;
+    private final AvatarService avatarService;
 
-    public UserEvents(UsersService usersService) {
+    public UserEvents(UserService usersService, AvatarService avatarService) {
         this.usersService = usersService;
+        this.avatarService = avatarService;
     }
 
     @KafkaListener(topics = "create-user-events", groupId = "products-group")
     public void listenCreateUser(KafkaUserCreatedEvent object) {
-        System.out.println("==============================================");
-        System.out.println("Create User Event: " + object.toString());
-        System.out.println("==============================================");
-
         this.usersService.createUser(object);
     }
 
-    
     @KafkaListener(topics = "remove-user-events", groupId = "products-group")
     public void listenRemoveUser(KafkaUserRemovedEvent object) {
-        System.out.println("==============================================");
-        System.out.println("Remove User Event: " + object.toString());
-        System.out.println("==============================================");
+
+        this.avatarService.deleteAvatarByUserId(object.userId());
 
         this.usersService.deleteUser(object);
     }

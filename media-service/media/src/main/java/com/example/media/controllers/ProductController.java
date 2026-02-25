@@ -1,29 +1,35 @@
 package com.example.media.controllers;
 
-import com.example.media.models.ProductImage;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.UUID;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.InputStream;
-import java.io.ByteArrayInputStream;
-import java.util.UUID;
-
-import com.example.media.repositories.ProductRepository;
-import com.example.media.services.ProductImageSrvice;
+import com.example.media.models.ProductImage;
+import com.example.media.repositories.ProductImageRepository;
+import com.example.media.services.ProductImageService;
 import com.example.media.stores.ProductimageContentStore;
 
 @RestController
 @RequestMapping("/api/media/products")
 public class ProductController {
 
-    private final ProductImageSrvice productImageService;
-    private final ProductRepository repository;
+    private final ProductImageService productImageService;
+    private final ProductImageRepository repository;
     private final ProductimageContentStore contentStore;
 
-    public ProductController(ProductImageSrvice productImageService,
-            ProductRepository repository,
+    public ProductController(ProductImageService productImageService,
+            ProductImageRepository repository,
             ProductimageContentStore contentStore) {
         this.productImageService = productImageService;
         this.repository = repository;

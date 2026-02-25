@@ -5,9 +5,10 @@ import java.util.UUID;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import com.example.media.models.Product;
+import com.example.media.models.ProductImage;
+
 
 @Repository
-public interface ProductRepository extends MongoRepository<Product, UUID> {
+public interface ProductImageRepository extends MongoRepository<ProductImage, UUID> {
 
 }

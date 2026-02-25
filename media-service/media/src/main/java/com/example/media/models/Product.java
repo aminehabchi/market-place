@@ -11,9 +11,15 @@ import lombok.Data;
 @Data
 @Document(collection = "products")
 public class Product {
+
     @Id
     private UUID id;
 
     @Field("user_id")
-    private UUID userId;
+    private String userId;
+
+    public Product(UUID id, String userId) {
+        this.id = id;
+        this.userId = userId;
+    }
 }

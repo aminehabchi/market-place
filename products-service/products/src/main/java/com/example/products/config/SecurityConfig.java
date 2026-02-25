@@ -36,8 +36,6 @@ public class SecurityConfig {
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-
-            // ✅ Add your custom header filter BEFORE Spring's auth filter
             .addFilterBefore(
                 headerAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class
