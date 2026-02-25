@@ -1,5 +1,6 @@
 package com.example.media.models;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.content.commons.annotations.ContentId;
@@ -25,6 +26,9 @@ public class ProductImage {
 
     @Field("product_id")
     private UUID productId;
+    
+    @Field("created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     private ImageStatus status = ImageStatus.TEMPORARY;
 

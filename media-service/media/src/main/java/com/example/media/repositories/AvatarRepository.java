@@ -10,4 +10,5 @@ import com.example.media.models.UserAvatar;
 @Repository
 public interface AvatarRepository extends MongoRepository<UserAvatar, UUID> {
 
+    UserAvatar findByUserId(String userId);
 }

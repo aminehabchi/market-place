@@ -1,21 +1,33 @@
 package com.example.media.models;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.content.commons.annotations.ContentId;
 import org.springframework.content.commons.annotations.ContentLength;
 import org.springframework.content.commons.annotations.MimeType;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import com.example.shared.common.types.ImageStatus;
 
 import lombok.Data;
 
 @Data
 @Document(collection = "users_avatars")
 public class UserAvatar {
+
     @Id
     private UUID id;
+
+    @Field("user_id")
+    private String UserId;
+
+    @Field("created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    private ImageStatus status = ImageStatus.TEMPORARY;
 
     @ContentId
     private UUID contentId;

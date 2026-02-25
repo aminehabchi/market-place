@@ -20,6 +20,8 @@ import com.example.media.repositories.ProductImageRepository;
 import com.example.media.services.ProductImageService;
 import com.example.media.stores.ProductimageContentStore;
 
+import jakarta.annotation.security.PermitAll;
+
 @RestController
 @RequestMapping("/api/media/products")
 public class ProductController {
@@ -57,6 +59,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
+    @PermitAll
     public ResponseEntity<byte[]> getImage(@PathVariable UUID id)
             throws Exception {
 

@@ -16,6 +16,9 @@ public class RouterConfig {
                 .route("users", r -> r
                         .path("/api/users/**")
                         .uri("lb://users"))
+                .route("media", r -> r
+                        .path("/api/media/**")
+                        .uri("lb://media"))
                 .build();
     }
 }

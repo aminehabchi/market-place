@@ -19,6 +19,8 @@ import com.example.media.repositories.AvatarRepository;
 import com.example.media.services.AvatarService;
 import com.example.media.stores.UserAvatarContentStore;
 
+import jakarta.annotation.security.PermitAll;
+
 @RestController
 @RequestMapping("/api/media/users")
 public class UserController {
@@ -39,7 +41,7 @@ public class UserController {
     public ResponseEntity<UUID> uploadAvatar(
             @RequestBody byte[] fileBytes,
             @RequestHeader("Content-Type") String mimeType) throws Exception {
-
+        System.out.println("=======================>>>>>>>>>>>>>>>>>>>>>>>> image Uploded");
         UserAvatar avatar = avatarService.uploadAvatar(
                 new ByteArrayInputStream(fileBytes),
                 mimeType);
@@ -47,8 +49,8 @@ public class UserController {
         return ResponseEntity.ok(avatar.getId());
     }
 
-
     @GetMapping("/{id}")
+    @PermitAll
     public ResponseEntity<byte[]> getAvatar(@PathVariable UUID id)
             throws Exception {
 

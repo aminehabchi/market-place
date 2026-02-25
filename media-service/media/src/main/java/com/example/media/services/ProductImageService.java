@@ -1,56 +1,69 @@
 package com.example.media.services;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.media.models.ProductImage;
 import com.example.media.repositories.ProductImageRepository;
 import com.example.media.stores.ProductimageContentStore;
+import com.example.shared.common.types.ImageStatus;
 
 @Service
 public class ProductImageService {
+
     private final ProductImageRepository repository;
     private final ProductimageContentStore contentStore;
 
     public ProductImageService(ProductImageRepository repository,
-            ProductimageContentStore contentStore) {
+                               ProductimageContentStore contentStore) {
         this.repository = repository;
         this.contentStore = contentStore;
     }
 
-    public ProductImage uploadAvatar(InputStream inputStream, String mimeType) throws Exception {
-        // Create metadata
+    @Transactional
+    public ProductImage uploadAvatar(InputStream inputStream, String mimeType) {
         ProductImage image = new ProductImage();
         image.setMimeType(mimeType);
 
         // Save metadata first
         image = repository.save(image);
-
-        // Save actual file bytes to filesystem via Spring Content
+        // Save actual file bytes
         contentStore.setContent(image, inputStream);
-
-        repository.save(image);
-
+        // Update entity if content store modifies it
+        image = repository.save(image);
         return image;
     }
 
-    public void deleteImage(UUID id) throws IOException {
-
+    @Transactional
+    public void deleteImage(UUID id) {
         ProductImage image = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Image not found"));
+                .orElseThrow(() -> new RuntimeException("Image not found: " + id));
 
-        //  Delete binary content (file)
+        // Delete file content
         contentStore.unsetContent(image);
-
-        // Delete metadata (DB row)
+        // Delete metadata
         repository.delete(image);
     }
 
+    @Transactional
+    public void deleteProductImageByProductId(UUID productId) {
+        List<ProductImage> images = repository.findByProductId(productId);
 
-    public void deleteProductImageByProductId(UUID id){
+        for (ProductImage img : images) {
+            contentStore.unsetContent(img);
+            repository.delete(img);
+        }
+    }
 
+    @Transactional
+    public void confirmImage(UUID id) {
+        repository.findById(id).ifPresent(img -> {
+            img.setStatus(ImageStatus.LINKED);
+            repository.save(img);
+        });
     }
 }
