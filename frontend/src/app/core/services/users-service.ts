@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { env } from '../../../env/env';
 
 export interface LoginPayload {
   identification: string;
@@ -48,11 +47,11 @@ export class UsersService {
   constructor(private http: HttpClient) { }
 
   loginUser(userData: LoginPayload): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(env.apiUrl + this.loginPath, userData);
+    return this.http.post<LoginResponse>(this.loginPath, userData);
   }
 
   meUser(): Observable<Me> {
-    return this.http.get<Me>(`${env.apiUrl}/api/users/me`);
+    return this.http.get<Me>(`/api/users/me`);
   }
 
   registerUser(userData: RegisterPayload): Observable<Response> {
@@ -63,7 +62,7 @@ export class UsersService {
 
     formData.append('info', infoBlob);
 
-    return this.http.post<Response>(env.apiUrl + this.registerPath, formData);
+    return this.http.post<Response>(this.registerPath, formData);
   }
 
   registerUserWithAvatar(userData: RegisterPayload, avatar?: File | null): Observable<Response> {
@@ -77,7 +76,7 @@ export class UsersService {
       formData.append('avatar', avatar, avatar.name);
     }
 
-    return this.http.post<Response>(env.apiUrl + this.registerPath, formData);
+    return this.http.post<Response>(this.registerPath, formData);
   }
 
   updateUser(userData: UpdateProfile, avatar?: File | null): Observable<Response> {
@@ -91,7 +90,7 @@ export class UsersService {
       formData.append('avatar', avatar, avatar.name);
     }
 
-    return this.http.post<Response>(env.apiUrl + this.registerPath, formData);
+    return this.http.post<Response>(this.registerPath, formData);
   }
 
   logeUser(userData: LoginPayload): Observable<LoginResponse> {
