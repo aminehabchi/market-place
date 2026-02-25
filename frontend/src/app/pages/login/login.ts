@@ -1,8 +1,9 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { LoginService } from './loginService';
 import { Router, RouterLink } from '@angular/router';
+import { UsersService } from '../../core/services/users-service';
+
 
 @Component({
   selector: 'app-login',
@@ -20,7 +21,7 @@ export class Login {
   };
 
   constructor(
-    private loginService: LoginService,
+    private loginService: UsersService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: object
   ) { }

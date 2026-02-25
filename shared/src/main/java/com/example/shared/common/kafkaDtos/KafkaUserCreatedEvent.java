@@ -1,4 +1,6 @@
 package com.example.shared.common.kafkaDtos;
 
-public record KafkaUserCreatedEvent(String userId, String email, String username) {
+import org.springframework.web.multipart.MultipartFile;
+
+public record KafkaUserCreatedEvent(String userId, String email, String username, MultipartFile avatar) {
 }

@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { LoginService } from '../login/loginService';
+import { UsersService } from '../../core/services/users-service';
 
 @Component({
   selector: 'app-register',
@@ -12,10 +12,9 @@ import { LoginService } from '../login/loginService';
 })
 export class Register {
   message = '';
-  // errorMessage = '';
   isSubmitting = false;
   errorMessage = signal({ msg: '', isthere: false })
-  // errorMessage = { msg: '', isthere: false };
+  selectedAvatar: File | null = null;
 
   user = {
     email: '',
@@ -25,7 +24,20 @@ export class Register {
     role: 'GUEST'
   };
 
-  constructor(private loginService: LoginService) { }
+  constructor(private loginService: UsersService) { }
+
+  onAvatarSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files && input.files.length > 0 ? input.files[0] : null;
+    if (file && file?.size > 1024 * 1024 * 1024 * 2048) {
+      this.errorMessage.set({ msg: 'file size must not passe 2mb', isthere: true });
+      return;
+    } else if (file && file.type != 'image/png') {
+      this.errorMessage.set({ msg: 'file type must be image', isthere: true });
+      return;
+    }
+    this.selectedAvatar = file;
+  }
 
   onSubmit(form: NgForm): void {
     if (form.invalid || this.isSubmitting) {
@@ -33,7 +45,7 @@ export class Register {
     }
 
     if (this.user.password !== this.user.confirmPassword) {
-      // this.errorMessage = 'Passwords do not match.';
+      this.errorMessage.set({ msg: 'Passwords do not match.', isthere: true });
       this.message = '';
       return;
     }
@@ -41,15 +53,16 @@ export class Register {
     this.isSubmitting = true;
     this.message = '';
 
-    this.loginService.registerUser({
+    this.loginService.registerUserWithAvatar({
       email: this.user.email,
       name: this.user.name,
       password: this.user.password,
       role: this.user.role
-    }).subscribe({
+    }, this.selectedAvatar).subscribe({
       next: (res) => {
         this.message = res.msg || 'Registration successful. You can login now.';
         this.isSubmitting = false;
+        this.selectedAvatar = null;
         form.resetForm({
           email: '',
           name: '',
@@ -57,20 +70,19 @@ export class Register {
           confirmPassword: '',
           role: 'GUEST'
         });
-        // this.errorMessage.isthere = false;
         this.errorMessage.update((b) => {
           b.isthere = false;
           b.msg = '';
           return b;
         });
-        // this.errorMessage.msg = "";
 
       },
       error: (err) => {
-        this.errorMessage.set({ msg: err.error.message, isthere: true });
-        // console.error("whyyyyyyyy ", err.error.message);
+        this.errorMessage.set({
+          msg: err?.error?.message || err?.error?.msg || 'Registration failed. Please try again.',
+          isthere: true
+        });
         this.isSubmitting = false;
-        // console.error(this.errorMessage.msg);
       }
     });
   }

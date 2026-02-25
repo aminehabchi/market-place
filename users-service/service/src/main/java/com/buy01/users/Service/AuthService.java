@@ -3,6 +3,7 @@ package com.buy01.users.Service;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.buy01.users.DTOs.LoginReqDTOs;
 import com.buy01.users.DTOs.LoginResDTOs;
@@ -12,6 +13,9 @@ import com.buy01.users.DTOs.UserCreatedEvent;
 import com.buy01.users.Entity.User;
 import com.buy01.users.Repository.UserRepository;
 import com.buy01.users.Utils.JwtUtils;
+
+import java.util.UUID;
+
 import org.springframework.kafka.core.KafkaTemplate;
 import com.example.shared.common.kafkaDtos.KafkaUserCreatedEvent;
 import com.example.shared.common.types.Role;
@@ -31,17 +35,20 @@ public class AuthService {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public RegisterResDTOs register(RegisterReqDTOs req) {
+    public RegisterResDTOs register(RegisterReqDTOs req, MultipartFile avatar) {
         Role role = normalizeRole(req.role());
         boolean exist = userRepository.existsByEmail(req.email());
         if (exist) {
             throw new UserExistException("Invalid Email");
         }
+        String avatarUrl = null;
+        if (avatar != null && !avatar.isEmpty()) {
+            avatarUrl = "/uploads/" + UUID.randomUUID().toString() + avatar.getOriginalFilename();
+        }
         User user = new User(null, req.name(), req.email(), passwordEncoder.encode(req.password()),
-                role.toString().substring(5), null);
-        System.out.println("name ==================== " + req.name());
+                role.toString().substring(5), avatarUrl);
         userRepository.save(user);
-        KafkaUserCreatedEvent event = new KafkaUserCreatedEvent(null, user.email(), user.name());
+        KafkaUserCreatedEvent event = new KafkaUserCreatedEvent(null, user.email(), user.name(), avatar);
         kafkaTemplate.send("create-user-events", null, event);
         return new RegisterResDTOs("user created");
     }
