@@ -66,7 +66,7 @@ export class Register {
       name: this.user.name,
       password: this.user.password,
       role: this.user.role,
-      image: this.imageName
+      avatarUrl: this.imageName
     }).subscribe({
       next: (res) => {
         this.message = res.msg || 'Registration successful. You can login now.';

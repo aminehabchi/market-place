@@ -19,20 +19,21 @@ export interface RegisterPayload {
   name: string;
   password: string;
   role: string;
-  image: string;
+  avatarUrl: string;
 }
 
 export interface Me {
+  id: string;
+  username: string;
   email: string;
-  name: string;
-  password: string;
   role: string;
-  avatar: File;
+  avatarUrl: string;
 }
 
 export interface UpdateProfile {
   name: string;
-  password: string;
+  email: string;
+  avatarUrl: string;
 }
 
 export interface Response {
@@ -86,18 +87,8 @@ export class UsersService {
     return this.http.post<Response>(env.apiUrl + this.mediaPath, formData);
   }
 
-  updateUser(userData: UpdateProfile): Observable<Response> {
-    // const formData = new FormData();
-    // const infoBlob = new Blob([JSON.stringify(userData)], {
-    //   type: 'application/json'
-    // });
-
-    // formData.append('info', infoBlob);
-    // if (avatar) {
-    //   formData.append('avatar', avatar, avatar.name);
-    // }
-
-    return this.http.put<Response>(env.apiUrl + this.registerPath, userData);
+  updateUser(userData: UpdateProfile): Observable<Me> {
+    return this.http.put<Me>(`${env.apiUrl}/api/users/me`, userData);
   }
 
   updateAvatar(oldAvatar: File, newAvatar: File): Observable<Response> {
