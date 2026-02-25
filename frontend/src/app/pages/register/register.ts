@@ -15,7 +15,7 @@ export class Register {
   isSubmitting = false;
   errorMessage = signal({ msg: '', isthere: false })
   selectedAvatar: File | null = null;
-
+  imageName: string = "";
   user = {
     email: '',
     name: '',
@@ -52,13 +52,22 @@ export class Register {
 
     this.isSubmitting = true;
     this.message = '';
-
-    this.loginService.registerUserWithAvatar({
+    this.loginService.registerUserWithAvatar(this.selectedAvatar).subscribe({
+      next: (res) => {
+        console.log(res);
+        this.imageName = res.msg;
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    })
+    this.loginService.registerUser({
       email: this.user.email,
       name: this.user.name,
       password: this.user.password,
-      role: this.user.role
-    }, this.selectedAvatar).subscribe({
+      role: this.user.role,
+      image: this.imageName
+    }).subscribe({
       next: (res) => {
         this.message = res.msg || 'Registration successful. You can login now.';
         this.isSubmitting = false;

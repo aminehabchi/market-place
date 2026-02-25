@@ -19,6 +19,7 @@ export interface RegisterPayload {
   name: string;
   password: string;
   role: string;
+  image: string;
 }
 
 export interface Me {
@@ -44,6 +45,7 @@ export interface Response {
 export class UsersService {
   private readonly loginPath = '/api/users/login';
   private readonly registerPath = '/api/users/register';
+  private readonly mediaPath = '/api/media/register';
 
   constructor(private http: HttpClient) { }
 
@@ -56,42 +58,57 @@ export class UsersService {
   }
 
   registerUser(userData: RegisterPayload): Observable<Response> {
-    const formData = new FormData();
-    const infoBlob = new Blob([JSON.stringify(userData)], {
-      type: 'application/json'
-    });
+    // const formData = new FormData();
+    // const infoBlob = new Blob([JSON.stringify(userData)], {
+    //   type: 'application/json'
+    // });
 
-    formData.append('info', infoBlob);
+    // formData.append('info', infoBlob);
 
-    return this.http.post<Response>(env.apiUrl + this.registerPath, formData);
+    return this.http.post<Response>(env.apiUrl + this.registerPath, userData);
   }
 
-  registerUserWithAvatar(userData: RegisterPayload, avatar?: File | null): Observable<Response> {
-    const formData = new FormData();
-    const infoBlob = new Blob([JSON.stringify(userData)], {
-      type: 'application/json'
-    });
+  meImage() {
 
-    formData.append('info', infoBlob);
+  }
+
+  registerUserWithAvatar(avatar?: File | null): Observable<Response> {
+    const formData = new FormData();
+    // const infoBlob = new Blob([JSON.stringify(userData)], {
+    //   type: 'application/json'
+    // });
+
+    // formData.append('info', infoBlob);
     if (avatar) {
       formData.append('avatar', avatar, avatar.name);
     }
 
-    return this.http.post<Response>(env.apiUrl + this.registerPath, formData);
+    return this.http.post<Response>(env.apiUrl + this.mediaPath, formData);
   }
 
-  updateUser(userData: UpdateProfile, avatar?: File | null): Observable<Response> {
+  updateUser(userData: UpdateProfile): Observable<Response> {
+    // const formData = new FormData();
+    // const infoBlob = new Blob([JSON.stringify(userData)], {
+    //   type: 'application/json'
+    // });
+
+    // formData.append('info', infoBlob);
+    // if (avatar) {
+    //   formData.append('avatar', avatar, avatar.name);
+    // }
+
+    return this.http.put<Response>(env.apiUrl + this.registerPath, userData);
+  }
+
+  updateAvatar(oldAvatar: File, newAvatar: File): Observable<Response> {
     const formData = new FormData();
-    const infoBlob = new Blob([JSON.stringify(userData)], {
-      type: 'application/json'
-    });
-
-    formData.append('info', infoBlob);
-    if (avatar) {
-      formData.append('avatar', avatar, avatar.name);
+    if (oldAvatar) {
+      formData.append('oldAvatar', oldAvatar, oldAvatar.name);
     }
-
-    return this.http.post<Response>(env.apiUrl + this.registerPath, formData);
+    if (newAvatar) {
+      formData.append('newAvatar', newAvatar, newAvatar.name);
+    }
+    return this.http.put<Response>(env.apiUrl + this.mediaPath, formData);
   }
 
   logeUser(userData: LoginPayload): Observable<LoginResponse> {
