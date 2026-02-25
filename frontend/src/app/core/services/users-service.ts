@@ -52,7 +52,7 @@ export class UsersService {
   }
 
   meUser(): Observable<Me> {
-    return this.http.get<Me>(`${env.apiUrl}/me`);
+    return this.http.get<Me>(`${env.apiUrl}/api/users/me`);
   }
 
   registerUser(userData: RegisterPayload): Observable<Response> {

@@ -12,6 +12,13 @@ export class Profile implements OnInit {
   constructor(private userService: UsersService) { }
 
   ngOnInit(): void {
-    this.userService
+    this.userService.meUser().subscribe({
+      next: (res) => {
+        console.log(res);
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    })
   }
 }
