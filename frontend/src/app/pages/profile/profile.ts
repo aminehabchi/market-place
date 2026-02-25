@@ -12,14 +12,14 @@ export class Profile implements OnInit {
   constructor(private userService: UsersService) { }
 
   ngOnInit(): void {
-    this.userService.meImage().subscribe({
-      next: (res) => {
-        console.log(res);
-      },
-      error: (err) => {
-        console.error(err);
-      }
-    })
+    // this.userService.meImage().subscribe({
+    //   next: (res) => {
+    //     console.log(res);
+    //   },
+    //   error: (err) => {
+    //     console.error(err);
+    //   }
+    // })
 
     this.userService.meUser().subscribe({
       next: (res) => {

@@ -52,15 +52,15 @@ export class Register {
 
     this.isSubmitting = true;
     this.message = '';
-    this.loginService.registerUserWithAvatar(this.selectedAvatar).subscribe({
-      next: (res) => {
-        console.log(res);
-        this.imageName = res.msg;
-      },
-      error: (err) => {
-        console.error(err);
-      }
-    })
+    // this.loginService.registerUserWithAvatar(this.selectedAvatar).subscribe({
+    //   next: (res) => {
+    //     console.log(res);
+    //     this.imageName = res.msg;
+    //   },
+    //   error: (err) => {
+    //     console.error(err);
+    //   }
+    // })
     this.loginService.registerUser({
       email: this.user.email,
       name: this.user.name,

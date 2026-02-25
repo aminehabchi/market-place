@@ -25,16 +25,14 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> register(
-            @Valid @RequestPart("info") RegisterReqDTOs req,
-            @RequestPart(value = "avatar", required = false) MultipartFile avatar) {
-        if (avatar != null && avatar.getSize() < 1024 * 1024 * 1024 * 2048) {
-            return ResponseEntity.badRequest().body("size too large");
-        } else if (avatar != null && !avatar.getContentType().equals("image/png")) {
-            return ResponseEntity.badRequest().body("type must be image");
-        }
-        return ResponseEntity.ok(authService.register(req, avatar));
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterReqDTOs req) {
+        // if (avatar != null && avatar.getSize() < 1024 * 1024 * 1024 * 2048) {
+        // return ResponseEntity.badRequest().body("size too large");
+        // } else if (avatar != null && !avatar.getContentType().equals("image/png")) {
+        // return ResponseEntity.badRequest().body("type must be image");
+        // }
+        return ResponseEntity.ok(authService.register(req));
     }
 
     @PostMapping("/login")
