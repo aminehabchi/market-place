@@ -1,5 +1,6 @@
 package com.buy01.users.Service;
 
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -8,13 +9,16 @@ import com.buy01.users.DTOs.ProfileResDTOs;
 import com.buy01.users.DTOs.ProfileUpdateReqDTOs;
 import com.buy01.users.Entity.User;
 import com.buy01.users.Repository.UserRepository;
+import com.example.shared.common.kafkaDtos.KafkaUserUpdatedEvent;
 
 @Service
 public class ProfileService {
     private final UserRepository userRepository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public ProfileService(UserRepository userRepository) {
+    public ProfileService(UserRepository userRepository, KafkaTemplate<String, Object> kafkaTemplate) {
         this.userRepository = userRepository;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     public ProfileResDTOs getCurrentProfile() {
@@ -44,7 +48,9 @@ public class ProfileService {
                 user.role(),
                 updatedAvatarUrl);
 
-        userRepository.save(updated);
+        User newUser = userRepository.save(updated);
+        KafkaUserUpdatedEvent event = new KafkaUserUpdatedEvent(newUser.id(), newUser.name(), newUser.avatarUrl());
+        kafkaTemplate.send("update-user-events", null, event);
         return new ProfileResDTOs(updated.id(), updated.name(), updated.email(), updated.role(), updated.avatarUrl());
     }
 

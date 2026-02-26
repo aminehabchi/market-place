@@ -4,5 +4,5 @@ import java.util.UUID;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public record KafkaUserUpdatedEvent(UUID userId, String username, MultipartFile avatar) {
+public record KafkaUserUpdatedEvent(String userId, String username, String avatarUrl) {
 }

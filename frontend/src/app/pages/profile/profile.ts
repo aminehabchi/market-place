@@ -105,7 +105,7 @@ export class Profile implements OnInit {
           this.avatarName = res.msg;
         },
         error: (err) => {
-          console.error("error getting avatar name");
+          console.error("ERROR: ", err);
         }
       })
     }
