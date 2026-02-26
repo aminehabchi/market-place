@@ -73,8 +73,10 @@ export class UsersService {
     return this.http.post<Response>(this.registerPath, userData);
   }
 
-  meImage() {
-
+  getAvatar(avatar: string): Observable<Blob> {
+    return this.http.get(`${this.mediaPath}/${avatar}`, {
+      responseType: 'blob',
+    });
   }
 
   registerUserWithAvatar(avatar?: File | null): Observable<Response> {

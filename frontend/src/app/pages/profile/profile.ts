@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { Me, UpdateProfile, UsersService } from '../../core/services/users-service';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -13,7 +13,7 @@ import { of, switchMap } from 'rxjs';
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
-export class Profile implements OnInit {
+export class Profile implements OnInit, OnDestroy {
   userProfile = signal<Me | null>(null);
   isLoading = signal(true);
   isEditing = signal(false);
@@ -23,6 +23,7 @@ export class Profile implements OnInit {
   editFormName = signal('');
   editFormEmail = signal('');
   editFormAvatarUrl = signal('');
+  profileAvatarSrc = signal('');
   selectedAvatar: File | null = null;
   avatarName: string = '';
   constructor(
@@ -33,6 +34,37 @@ export class Profile implements OnInit {
 
   ngOnInit(): void {
     this.loadProfile();
+  }
+
+  ngOnDestroy(): void {
+    if (isPlatformBrowser(this.platformId) && this.profileAvatarSrc()) {
+      URL.revokeObjectURL(this.profileAvatarSrc());
+    }
+  }
+
+  loadProfileImg(avatarId: string): void {
+    if (!avatarId) {
+      this.profileAvatarSrc.set('');
+      return;
+    }
+
+    this.userService.getAvatar(avatarId).subscribe({
+      next: (res) => {
+        if (!isPlatformBrowser(this.platformId)) {
+          return;
+        }
+
+        if (this.profileAvatarSrc()) {
+          URL.revokeObjectURL(this.profileAvatarSrc());
+        }
+
+        const objectUrl = URL.createObjectURL(res);
+        this.profileAvatarSrc.set(objectUrl);
+      },
+      error: (err) => {
+        console.error("err: ==============> ",  err);
+      }
+    });
   }
 
   loadProfile(): void {
@@ -47,7 +79,7 @@ export class Profile implements OnInit {
         this.editFormName.set(res.username);
         this.editFormEmail.set(res.email);
         this.editFormAvatarUrl.set(res.avatarUrl || '');
-
+        this.loadProfileImg(res.avatarUrl);
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -103,13 +135,11 @@ export class Profile implements OnInit {
         .pipe(
           switchMap((avatarIdOrUrl) => {
             this.avatarName = avatarIdOrUrl;
-
             const updateData: UpdateProfile = {
               name: this.editFormName(),
               email: this.editFormEmail(),
               avatarUrl: avatarIdOrUrl,
             };
-
             return this.userService.updateUser(updateData);
           })
         )

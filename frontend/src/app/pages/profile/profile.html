@@ -23,8 +23,8 @@
         <div class="profile-card">
             <!-- Avatar Section -->
             <div class="avatar-section">
-                @if (userProfile()!.avatarUrl) {
-                <img [src]="userProfile()!.avatarUrl" [alt]="userProfile()!.username" class="profile-avatar" />
+                @if (profileAvatarSrc()) {
+                <img [src]="profileAvatarSrc()" [alt]="userProfile()!.username" class="profile-avatar" />
                 } @else {
                 <div class="profile-avatar-placeholder">
                     {{ userProfile()!.username.charAt(0).toUpperCase() }}
