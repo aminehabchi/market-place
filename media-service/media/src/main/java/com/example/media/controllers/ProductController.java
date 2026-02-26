@@ -23,7 +23,7 @@ import com.example.media.stores.ProductimageContentStore;
 import jakarta.annotation.security.PermitAll;
 
 @RestController
-@RequestMapping("/api/media/products")
+@RequestMapping("/products")
 public class ProductController {
 
     private final ProductImageService productImageService;
