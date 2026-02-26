@@ -22,7 +22,7 @@ public class ProductImage {
     private UUID id = UUID.randomUUID();
 
     @Field("user_id")
-    private UUID userId;
+    private String userId;
 
     @Field("product_id")
     private UUID productId;

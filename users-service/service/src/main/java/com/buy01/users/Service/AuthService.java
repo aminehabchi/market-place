@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
+import java.util.UUID;
 import com.buy01.users.DTOs.LoginReqDTOs;
 import com.buy01.users.DTOs.LoginResDTOs;
 import com.buy01.users.DTOs.RegisterReqDTOs;
@@ -44,7 +44,7 @@ public class AuthService {
         User user = new User(null, req.name(), req.email(), passwordEncoder.encode(req.password()),
                 role.toString().substring(5), avatarUrl);
         userRepository.save(user);
-        KafkaUserCreatedEvent event = new KafkaUserCreatedEvent(null, user.email(), user.name(), avatar);
+        KafkaUserCreatedEvent event = new KafkaUserCreatedEvent(null,  user.name());
         kafkaTemplate.send("create-user-events", null, event);
         return new RegisterResDTOs("user created");
     }
