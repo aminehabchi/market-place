@@ -1,44 +1,39 @@
 services:
-  media-mongodb:
-    image: mongo:latest
-    container_name: media-mongodb
+  media-service-mongodb:
+    build: ./database
+    container_name: media-service-mongodb
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=123123
-    ports:
-      - "27018:27018"
+      MONGO_INITDB_ROOT_USERNAME: amine
+      MONGO_INITDB_ROOT_PASSWORD: 1234
+      MONGO_INITDB_DATABASE: DB
     volumes:
       - mongo_data:/data/db
     networks:
-      - microservices-net
+      - shared-net
 
   media-service:
-    build: 
-      context: ./service
-    restart: on-failure
+    build:
+      context: ../
+      dockerfile: ./media-service/media/Dockerfile
     container_name: media-service
     ports:
-      - "9090:9090"
+      - "8888:8888"
     environment:
-      - JWT_SECRET=4cfeee175e498e32039c7e804957663cb8e09b58a0902bf56222acab991cb4bd955bdf3c25942131e432c59be57d411c31f25c6432bd18fd8f006b8913636da2
-      - JWT_EXP=3600000
-      - MONGODB_USERNAME=admin
-      - MONGODB_PWD=123123
-      - MONGODB_HOST=media-mongodb
-      - MONGODB_PORT=27018
-      - MONGO_DB=media_db
-      - MONGODB_AUTH=admin
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-    networks:
-      - microservices-net
+      SPRING_APPLICATION_NAME: media
+      SPRING_DATA_MONGODB_URI: mongodb://amine:1234@media-service-mongodb:27017/DB?authSource=admin
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      DISCOVERY : http://eureka-server:8761/eureka
     depends_on:
-        - media-mongodb
+      - media-service-mongodb
     volumes:
-      - ./service/src:/app/src
-      - ~/.gradle:/root/.gradle
-    working_dir: /app
+      - media_m2:/root/.m2
+    networks:
+      - shared-net
+
 volumes:
   mongo_data:
+  media_m2:
+
 networks:
-  microservices-net:
+  shared-net:
     external: true

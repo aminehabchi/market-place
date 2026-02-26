@@ -1,5 +1,6 @@
 package com.buy01.users.Service;
 
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -9,18 +10,12 @@ import com.buy01.users.DTOs.LoginReqDTOs;
 import com.buy01.users.DTOs.LoginResDTOs;
 import com.buy01.users.DTOs.RegisterReqDTOs;
 import com.buy01.users.DTOs.RegisterResDTOs;
-import com.buy01.users.DTOs.UserCreatedEvent;
 import com.buy01.users.Entity.User;
+import com.buy01.users.Exceptions.UserExistException;
 import com.buy01.users.Repository.UserRepository;
 import com.buy01.users.Utils.JwtUtils;
-
-import java.util.UUID;
-
-import org.springframework.kafka.core.KafkaTemplate;
-import com.example.shared.common.kafkaDtos.KafkaUserCreatedEvent;
+import com.example.shared.common.kafka.dtos.users.KafkaUserCreatedEvent;
 import com.example.shared.common.types.Role;
-import com.buy01.users.Exceptions.UserExistException;
-
 @Service
 public class AuthService {
     private final UserRepository userRepository;

@@ -19,14 +19,14 @@ public class ProductService {
     }
 
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        return productRepository.findAllByOrderByCreatedAtDesc();
     }
 
     public Product getProductById(UUID id) {
         return productRepository.findById(id).orElse(null);
     }
 
-    public Product createProduct(CreateProdutDto productDto, UUID userId) {
+    public Product createProduct(CreateProdutDto productDto, String userId) {
         Product product = new Product(productDto, userId);
 
         return productRepository.save(product);

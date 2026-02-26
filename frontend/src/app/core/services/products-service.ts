@@ -1,8 +1,52 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ApiResponse } from '../models/ApiResponse';
+import { Product } from '../models/Product';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductsService {
-  
+  private apiUrl = '/api/products';
+
+  constructor(private http: HttpClient) { }
+
+  createProduct(post: Partial<Product>): Observable<ApiResponse<Product>> {
+    return this.http.post<ApiResponse<Product>>(
+      `${this.apiUrl}/`,
+      post,
+      {
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+  }
+
+  getAllProducts(): Observable<ApiResponse<Product[]>> {
+    return this.http.get<ApiResponse<Product[]>>(
+      `${this.apiUrl}`
+    );
+  }
+
+  getMyProducts() {
+    return this.http.get<ApiResponse<Product[]>>(
+      `${this.apiUrl}/me`
+    );
+  }
+
+  deleteProducts(id: string) {
+    return this.http.delete<ApiResponse<any>>(
+      `${this.apiUrl}/${id}`
+    );
+  }
+
+  updateProduct(id: string, product: Product) {
+    return this.http.put<ApiResponse<Product>>(
+      `${this.apiUrl}/${id}`,
+      product,
+      {
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+  }
 }

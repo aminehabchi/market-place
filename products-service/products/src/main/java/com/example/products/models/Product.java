@@ -1,9 +1,7 @@
 package com.example.products.models;
 
-import java.util.UUID;
 
 import com.example.shared.common.database.BaseEntity;
-
 
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -30,13 +28,18 @@ public class Product extends BaseEntity {
 
     private double price;
 
-    @Field("userId")
-    private UUID userId;
+    private long quantity;
 
-    public Product(CreateProdutDto dto, UUID userId) {
+    private String image;
+
+    @Field("userId")
+    private String userId;
+
+    public Product(CreateProdutDto dto, String userId) {
         this.name = dto.getName();
         this.description = dto.getDescription();
         this.price = dto.getPrice();
+        this.image = dto.getImage();
         this.userId = userId;
     }
 

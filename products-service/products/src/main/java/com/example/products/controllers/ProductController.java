@@ -36,9 +36,15 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping({ "", "/" })
+    @GetMapping("/")
     @PermitAll
     public ResponseEntity<ApiResponse<List<Product>>> getProducts() {
+        return ResponseEntity.ok(ApiResponse.success(productService.getAllProducts()));
+    }
+
+    @GetMapping("/me")
+    @PermitAll
+    public ResponseEntity<ApiResponse<List<Product>>> getMyProducts() {
         return ResponseEntity.ok(ApiResponse.success(productService.getAllProducts()));
     }
 
@@ -51,14 +57,12 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.success(product));
     }
 
-    @PostMapping({ "", "/" })
-    public ResponseEntity<ApiResponse<Product>> createProduct(@RequestBody @Valid CreateProdutDto productDto,
+    @PostMapping("/")
+    public ResponseEntity<ApiResponse<Product>> createProduct(
+            @RequestBody @Valid CreateProdutDto productDto,
             Authentication authentication) {
-        /*******************************************/
-        /* TODO: Need Owner ID from authentication */
-        /*******************************************/
 
-        UUID userId = UUID.randomUUID();
+        String userId = (String) authentication.getPrincipal();
 
         Product createdProduct = this.productService.createProduct(productDto, userId);
 
@@ -75,14 +79,13 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error("Product not found", HttpStatus.NOT_FOUND));
         }
-        /*******************************************/
-        /* TODO: Need Owner ID from authentication */
-        /*******************************************/
-        UUID userId = UUID.randomUUID();
+
+        String userId = (String) authentication.getPrincipal();
 
         if (!product.getUserId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(ApiResponse.error("You are not the owner of this product", HttpStatus.FORBIDDEN));
+                    .body(ApiResponse.error("You are not the owner of this product",
+                            HttpStatus.FORBIDDEN));
         }
 
         this.productService.deleteProduct(id);
@@ -102,14 +105,13 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error("Product not found", HttpStatus.NOT_FOUND));
         }
-        /*******************************************/
-        /* TODO: Need Owner ID from authentication */
-        /*******************************************/
-        UUID userId = UUID.randomUUID();
+
+        String userId = (String) authentication.getPrincipal();
 
         if (!product.getUserId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(ApiResponse.error("You are not the owner of this product", HttpStatus.FORBIDDEN));
+                    .body(ApiResponse.error("You are not the owner of this product",
+                            HttpStatus.FORBIDDEN));
         }
 
         Product updateProduct = this.productService.updateProduct(product, productDto);
