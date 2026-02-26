@@ -9,7 +9,8 @@ import com.buy01.users.DTOs.ProfileResDTOs;
 import com.buy01.users.DTOs.ProfileUpdateReqDTOs;
 import com.buy01.users.Entity.User;
 import com.buy01.users.Repository.UserRepository;
-import com.example.shared.common.kafkaDtos.KafkaUserUpdatedEvent;
+// import com.example.shared.common.kafkaDtos.KafkaUserUpdatedEvent;
+import com.example.shared.common.kafka.dtos.users.KafkaUserUpdatedEvent;
 
 @Service
 public class ProfileService {
@@ -49,7 +50,8 @@ public class ProfileService {
                 updatedAvatarUrl);
 
         User newUser = userRepository.save(updated);
-        KafkaUserUpdatedEvent event = new KafkaUserUpdatedEvent(newUser.id(), newUser.name(), newUser.avatarUrl());
+        KafkaUserUpdatedEvent event = new KafkaUserUpdatedEvent(newUser.id(), newUser.name(), user.avatarUrl(),
+                updatedAvatarUrl);
         kafkaTemplate.send("update-user-events", null, event);
         return new ProfileResDTOs(updated.id(), updated.name(), updated.email(), updated.role(), updated.avatarUrl());
     }

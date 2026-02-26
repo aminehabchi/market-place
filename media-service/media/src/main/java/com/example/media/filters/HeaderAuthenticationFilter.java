@@ -30,7 +30,7 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String userId = request.getHeader("X-User-Id");
-        String roleHeader = request.getHeader("X-User-Role");
+        String roleHeader = "ROLE_" +  request.getHeader("X-User-Role");
 
         System.out.println("userId ========> " + userId);
         System.out.println("role ========> " + roleHeader);
@@ -40,8 +40,9 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
+        System.out.println("================ " + roleHeader);
         Role role = Role.fromString(roleHeader);
+        System.out.println("================ " + role);
 
         // Only parse UUID for roles that need it
         if (role.isBuyer() || role.isSeller() || role.isAdmin()) {
@@ -65,7 +66,7 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
- 
+
         filterChain.doFilter(request, response);
     }
 }

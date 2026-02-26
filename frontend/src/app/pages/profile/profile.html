@@ -55,10 +55,6 @@
                     <label>User ID</label>
                     <p class="user-id">{{ userProfile()!.id }}</p>
                 </div>
-                <div class="field-group">
-                    <label for="avatar">Avatar (optional)</label>
-                    <input id="avatar" name="avatar" type="file" accept="image/*" (change)="onAvatarSelected($event)" />
-                </div>
             </div>
 
             <div class="action-buttons">
@@ -82,9 +78,8 @@
                 </div>
 
                 <div class="field-group">
-                    <label for="avatarUrl">Avatar URL (optional)</label>
-                    <input id="avatarUrl" name="avatarUrl" type="url" [ngModel]="editFormAvatarUrl()"
-                        (ngModelChange)="editFormAvatarUrl.set($event)" placeholder="https://example.com/avatar.jpg" />
+                    <label for="avatar">Avatar (optional)</label>
+                    <input id="avatar" name="avatar" type="file" accept="image/*" (change)="onAvatarSelected($event)" />
                 </div>
 
                 @if (successMessage()) {

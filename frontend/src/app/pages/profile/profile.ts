@@ -5,6 +5,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PLATFORM_ID, Inject } from '@angular/core';
+import { of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -93,34 +94,36 @@ export class Profile implements OnInit {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    const updateData: UpdateProfile = {
-      name: this.editFormName(),
-      email: this.editFormEmail(),
-      avatarUrl: this.avatarName
-    };
+    const upload$ = this.selectedAvatar
+      ? this.userService.updateAvatar(this.selectedAvatar)
+      : null;
 
-    if (this.selectedAvatar != null) {
-      this.userService.updateAvatar(this.selectedAvatar).subscribe({
-        next: (res) => {
-          this.avatarName = res.msg;
-        },
-        error: (err) => {
-          console.error("ERROR: ", err);
-        }
-      })
-    }
+    if (upload$)
+      upload$
+        .pipe(
+          switchMap((avatarIdOrUrl) => {
+            this.avatarName = avatarIdOrUrl;
 
-    this.userService.updateUser(updateData).subscribe({
-      next: (res) => {
-        this.userProfile.set(res);
-        this.successMessage.set('Profile updated successfully!');
-        this.isSubmitting.set(false);
-        this.isEditing.set(false);
-      },
-      error: (err) => {
-        this.errorMessage.set(err?.error?.message || err?.error?.msg || 'Failed to update profile. Please try again.');
-        this.isSubmitting.set(false);
-      }
-    });
+            const updateData: UpdateProfile = {
+              name: this.editFormName(),
+              email: this.editFormEmail(),
+              avatarUrl: avatarIdOrUrl,
+            };
+
+            return this.userService.updateUser(updateData);
+          })
+        )
+        .subscribe({
+          next: (res) => {
+            this.userProfile.set(res);
+            this.successMessage.set('Profile updated successfully!');
+            this.isSubmitting.set(false);
+            this.isEditing.set(false);
+          },
+          error: (err) => {
+            this.errorMessage.set(err?.error?.message || err?.error?.msg || 'Failed to update profile. Please try again.');
+            this.isSubmitting.set(false);
+          }
+        });
   }
 }

@@ -1,7 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { env } from '../../../env/env';
+import { Observable, from, switchMap, throwError } from 'rxjs';
 
 export interface LoginPayload {
   identification: string;
@@ -51,16 +50,16 @@ export interface Response {
 export class UsersService {
   private readonly loginPath = '/api/users/login';
   private readonly registerPath = '/api/users/register';
-  private readonly mediaPath = '/api/media/user';
+  private readonly mediaPath = '/api/media/users';
 
   constructor(private http: HttpClient) { }
 
   loginUser(userData: LoginPayload): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(env.apiUrl + this.loginPath, userData);
+    return this.http.post<LoginResponse>(this.loginPath, userData);
   }
 
   meUser(): Observable<Me> {
-    return this.http.get<Me>(`${env.apiUrl}/api/users/me`);
+    return this.http.get<Me>(`/api/users/me`);
   }
 
   registerUser(userData: RegisterPayload): Observable<Response> {
@@ -71,7 +70,7 @@ export class UsersService {
 
     // formData.append('info', infoBlob);
 
-    return this.http.post<Response>(env.apiUrl + this.registerPath, userData);
+    return this.http.post<Response>(this.registerPath, userData);
   }
 
   meImage() {
@@ -89,15 +88,27 @@ export class UsersService {
       formData.append('avatar', avatar, avatar.name);
     }
 
-    return this.http.post<Response>(env.apiUrl + this.mediaPath, formData);
+    return this.http.post<Response>(this.mediaPath, formData);
   }
 
   updateUser(userData: UpdateProfile): Observable<Me> {
-    return this.http.put<Me>(`${env.apiUrl}/api/users/me`, userData);
+    return this.http.put<Me>(`/api/users/me`, userData);
   }
 
-  updateAvatar(avatar: File | null): Observable<Response> {
-    return this.http.put<Response>(env.apiUrl + this.mediaPath, avatar);
+  updateAvatar(avatar: File | null): Observable<string> {
+    if (!avatar) {
+      return throwError(() => new Error('No avatar file provided'));
+    }
+
+    return from(avatar.arrayBuffer()).pipe(
+      switchMap((bytes) => {
+        const headers = new HttpHeaders({
+          'Content-Type': avatar.type || 'application/octet-stream',
+        });
+
+        return this.http.post<string>(`${this.mediaPath}/`, bytes, { headers });
+      })
+    );
   }
 
   logeUser(userData: LoginPayload): Observable<LoginResponse> {
