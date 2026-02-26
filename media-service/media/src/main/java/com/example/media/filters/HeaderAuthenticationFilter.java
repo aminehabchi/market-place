@@ -3,22 +3,20 @@ package com.example.media.filters;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.example.shared.common.types.Role;
+import com.mongodb.lang.NonNull;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import org.springframework.core.annotation.Order;
-
-import com.example.shared.common.types.Role;
-
-import com.mongodb.lang.NonNull;
 
 @Order(1)
 @Component
@@ -58,7 +56,7 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            var authorities = List.of(new SimpleGrantedAuthority(role.name()));
+            var authorities = List.of(new SimpleGrantedAuthority(roleHeader));
 
             var authentication = new UsernamePasswordAuthenticationToken(
                     userId, // null for guest
