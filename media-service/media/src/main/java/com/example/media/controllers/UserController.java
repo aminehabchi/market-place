@@ -5,7 +5,10 @@ import java.io.InputStream;
 import java.util.UUID;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,13 +43,35 @@ public class UserController {
     @PostMapping("/")
     public ResponseEntity<UUID> uploadAvatar(
             @RequestBody byte[] fileBytes,
-            @RequestHeader("Content-Type") String mimeType) throws Exception {
-        System.out.println("=======================>>>>>>>>>>>>>>>>>>>>>>>> image Uploded");
+            @RequestHeader("Content-Type") String mimeType, Authentication authentication) throws Exception {
+
+        String userId = (String) authentication.getPrincipal();
+
         UserAvatar avatar = avatarService.uploadAvatar(
                 new ByteArrayInputStream(fileBytes),
-                mimeType);
+                mimeType, userId);
 
         return ResponseEntity.ok(avatar.getId());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletAvatar(@PathVariable UUID id, Authentication authentication) throws Exception {
+        String userId = (String) authentication.getPrincipal();
+
+        UserAvatar avatar = this.avatarService.getAvatarbyId(id);
+        if (avatar == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!avatar.getUserId().equals(userId)) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("You are not the owner of the image");
+        }
+
+        this.avatarService.deleteAvatar(avatar);
+
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
@@ -54,8 +79,10 @@ public class UserController {
     public ResponseEntity<byte[]> getAvatar(@PathVariable UUID id)
             throws Exception {
 
-        UserAvatar avatar = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Avatar not found"));
+        UserAvatar avatar = this.avatarService.getAvatarbyId(id);
+        if (avatar == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         try (InputStream is = contentStore.getContent(avatar)) {
 

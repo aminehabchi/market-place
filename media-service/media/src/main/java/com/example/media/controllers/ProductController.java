@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.media.models.ProductImage;
+import com.example.media.models.UserAvatar;
 import com.example.media.repositories.ProductImageRepository;
 import com.example.media.services.ProductImageService;
 import com.example.media.stores.ProductimageContentStore;
@@ -41,19 +42,32 @@ public class ProductController {
     @PostMapping("")
     public ResponseEntity<UUID> uploadImage(
             @RequestBody byte[] fileBytes,
-            @RequestHeader("Content-Type") String mimeType) throws Exception {
+            @RequestHeader("Content-Type") String mimeType, Authentication authentication) throws Exception {
+        String userId = (String) authentication.getPrincipal();
 
         ProductImage avatar = productImageService.uploadAvatar(
                 new ByteArrayInputStream(fileBytes),
-                mimeType);
+                mimeType, userId);
 
         return ResponseEntity.ok(avatar.getId());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> DeleteImage(@PathVariable UUID id) throws Exception {
-        
-        productImageService.deleteImage(id);
+    public ResponseEntity<?> deleteImage(@PathVariable UUID id, Authentication authentication) throws Exception {
+        String userId = (String) authentication.getPrincipal();
+
+        ProductImage image = this.productImageService.getAvatarbyId(id);
+        if (image == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!image.getUserId().equals(userId)) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("You are not the owner of the image");
+        }
+
+        this.productImageService.deleteImage(image);
 
         return ResponseEntity.noContent().build();
     }
@@ -76,4 +90,5 @@ public class ProductController {
                     .body(bytes);
         }
     }
+
 }

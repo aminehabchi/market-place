@@ -19,15 +19,16 @@ public class ProductImageService {
     private final ProductimageContentStore contentStore;
 
     public ProductImageService(ProductImageRepository repository,
-                               ProductimageContentStore contentStore) {
+            ProductimageContentStore contentStore) {
         this.repository = repository;
         this.contentStore = contentStore;
     }
 
     @Transactional
-    public ProductImage uploadAvatar(InputStream inputStream, String mimeType) {
+    public ProductImage uploadAvatar(InputStream inputStream, String mimeType, String userId) {
         ProductImage image = new ProductImage();
         image.setMimeType(mimeType);
+        image.setUserId(userId);
 
         // Save metadata first
         image = repository.save(image);
@@ -39,13 +40,30 @@ public class ProductImageService {
     }
 
     @Transactional
-    public void deleteImage(UUID id) {
+    public void deleteImagebyId(UUID id) {
         ProductImage image = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Image not found: " + id));
 
         // Delete file content
         contentStore.unsetContent(image);
         // Delete metadata
+        repository.delete(image);
+    }
+
+    public ProductImage getAvatarbyId(UUID id) {
+        return repository.findById(id).orElse(null);
+    }
+
+    @Transactional
+    public void deleteImage(ProductImage image) {
+        if (image == null) {
+            return;
+        }
+
+        // Delete file content
+        contentStore.unsetContent(image);
+
+        // Delete DB record
         repository.delete(image);
     }
 

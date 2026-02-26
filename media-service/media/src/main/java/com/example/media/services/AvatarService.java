@@ -18,17 +18,18 @@ public class AvatarService {
     private final UserAvatarContentStore contentStore;
 
     public AvatarService(AvatarRepository repository,
-                         UserAvatarContentStore contentStore) {
+            UserAvatarContentStore contentStore) {
         this.repository = repository;
         this.contentStore = contentStore;
     }
 
     @Transactional
-    public UserAvatar uploadAvatar(InputStream inputStream, String mimeType) {
+    public UserAvatar uploadAvatar(InputStream inputStream, String mimeType, String userId) {
         // Create metadata
         UserAvatar avatar = new UserAvatar();
         avatar.setId(UUID.randomUUID());
         avatar.setMimeType(mimeType);
+        avatar.setUserId(userId);
 
         // Save metadata first
         avatar = repository.save(avatar);
@@ -47,6 +48,23 @@ public class AvatarService {
         UserAvatar avatar = repository.findByUserId(userId);
         if (avatar == null) {
             return; // nothing to delete
+        }
+
+        // Delete file content
+        contentStore.unsetContent(avatar);
+
+        // Delete DB record
+        repository.delete(avatar);
+    }
+
+    public UserAvatar getAvatarbyId(UUID id) {
+        return repository.findById(id).orElse(null);
+    }
+
+    @Transactional
+    public void deleteAvatar(UserAvatar avatar) {
+        if (avatar == null) {
+            return;
         }
 
         // Delete file content

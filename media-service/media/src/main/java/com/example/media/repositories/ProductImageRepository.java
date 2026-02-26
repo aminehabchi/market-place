@@ -1,5 +1,6 @@
 package com.example.media.repositories;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -7,9 +8,12 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import com.example.media.models.ProductImage;
+import com.example.shared.common.types.ImageStatus;
 
 @Repository
 public interface ProductImageRepository extends MongoRepository<ProductImage, UUID> {
 
     List<ProductImage> findByProductId(UUID id);
+
+    List<ProductImage> findByStatusAndCreatedAtBefore(ImageStatus status, LocalDateTime cutoff);
 }

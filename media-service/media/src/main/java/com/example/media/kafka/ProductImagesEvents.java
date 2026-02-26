@@ -17,5 +17,7 @@ public class ProductImagesEvents {
 
     @KafkaListener(topics = "confirm-image-events", groupId = "media-group")
     public void listenConfirmAvatar(KafkaConfirmImageEvent object) {
+
+        this.productImageService.confirmImage(object.id());
     }
 }
