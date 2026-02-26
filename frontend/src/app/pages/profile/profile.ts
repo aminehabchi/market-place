@@ -22,7 +22,8 @@ export class Profile implements OnInit {
   editFormName = signal('');
   editFormEmail = signal('');
   editFormAvatarUrl = signal('');
-
+  selectedAvatar: File | null = null;
+  avatarName: string = '';
   constructor(
     private userService: UsersService,
     private router: Router,
@@ -70,6 +71,19 @@ export class Profile implements OnInit {
     this.successMessage.set('');
   }
 
+  onAvatarSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files && input.files.length > 0 ? input.files[0] : null;
+    if (file && file?.size > 1024 * 1024 * 1024 * 2048) {
+      // this.errorMessage.set({ msg: 'file size must not passe 2mb', isthere: true });
+      return;
+    } else if (file && file.type != 'image/png') {
+      // this.errorMessage.set({ msg: 'file type must be image', isthere: true });
+      return;
+    }
+    this.selectedAvatar = file;
+  }
+
   onSubmit(form: NgForm): void {
     if (form.invalid || this.isSubmitting()) {
       return;
@@ -82,8 +96,19 @@ export class Profile implements OnInit {
     const updateData: UpdateProfile = {
       name: this.editFormName(),
       email: this.editFormEmail(),
-      avatarUrl: this.editFormAvatarUrl()
+      avatarUrl: this.avatarName
     };
+
+    if (this.selectedAvatar != null) {
+      this.userService.updateAvatar(this.selectedAvatar).subscribe({
+        next: (res) => {
+          this.avatarName = res.msg;
+        },
+        error: (err) => {
+          console.error("error getting avatar name");
+        }
+      })
+    }
 
     this.userService.updateUser(updateData).subscribe({
       next: (res) => {

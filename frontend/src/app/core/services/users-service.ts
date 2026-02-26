@@ -14,6 +14,11 @@ export interface LoginResponse {
   message: string;
 }
 
+export interface avatarUpdate {
+  oldAvatar: string;
+  newAvatar: string;
+}
+
 export interface RegisterPayload {
   email: string;
   name: string;
@@ -46,7 +51,7 @@ export interface Response {
 export class UsersService {
   private readonly loginPath = '/api/users/login';
   private readonly registerPath = '/api/users/register';
-  private readonly mediaPath = '/api/media/register';
+  private readonly mediaPath = '/api/media/user';
 
   constructor(private http: HttpClient) { }
 
@@ -91,15 +96,8 @@ export class UsersService {
     return this.http.put<Me>(`${env.apiUrl}/api/users/me`, userData);
   }
 
-  updateAvatar(oldAvatar: File, newAvatar: File): Observable<Response> {
-    const formData = new FormData();
-    if (oldAvatar) {
-      formData.append('oldAvatar', oldAvatar, oldAvatar.name);
-    }
-    if (newAvatar) {
-      formData.append('newAvatar', newAvatar, newAvatar.name);
-    }
-    return this.http.put<Response>(env.apiUrl + this.mediaPath, formData);
+  updateAvatar(avatar: File | null): Observable<Response> {
+    return this.http.put<Response>(env.apiUrl + this.mediaPath, avatar);
   }
 
   logeUser(userData: LoginPayload): Observable<LoginResponse> {

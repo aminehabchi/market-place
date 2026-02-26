@@ -55,12 +55,10 @@
                     <label>User ID</label>
                     <p class="user-id">{{ userProfile()!.id }}</p>
                 </div>
-                @if (userProfile()!.avatarUrl) {
-                <div class="detail-row">
-                    <label>Avatar URL</label>
-                    <p class="avatar-url">{{ userProfile()!.avatarUrl }}</p>
+                <div class="field-group">
+                    <label for="avatar">Avatar (optional)</label>
+                    <input id="avatar" name="avatar" type="file" accept="image/*" (change)="onAvatarSelected($event)" />
                 </div>
-                }
             </div>
 
             <div class="action-buttons">
