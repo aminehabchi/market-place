@@ -28,23 +28,21 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                // All GET requests to /api/media/products/** are public
-                .requestMatchers(HttpMethod.GET, "/api/media/products/**").permitAll()
-                // All GET requests to /api/media/users/** are public
-                .requestMatchers(HttpMethod.GET, "/api/media/users/**").permitAll()
-                // Non-GET requests to /api/media/products/** require SELLER or ADMIN
-                .requestMatchers("/api/media/products/**").hasAnyRole("SELLER", "ADMIN")
-                // Non-GET requests to /api/media/users/** require BUYER, SELLER, ADMIN
-                .requestMatchers("/api/media/users/**").hasAnyRole("BUYER", "SELLER", "ADMIN")
-                // Any other request requires authentication
-                .anyRequest().authenticated()
-                )
+                        // All GET requests to /products/** are public
+                        .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
+                        // All GET requests to /users/** are public
+                        .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
+                        // Non-GET requests to /products/** require SELLER or ADMIN
+                        .requestMatchers("/products/", "/products/**").hasAnyRole("SELLER", "ADMIN")
+                        // Non-GET requests to /users/** require BUYER, SELLER, ADMIN
+                        .requestMatchers("/users/**").hasAnyRole("BUYER", "SELLER", "ADMIN")
+                        // Any other request requires authentication
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(
                         headerAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                );
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

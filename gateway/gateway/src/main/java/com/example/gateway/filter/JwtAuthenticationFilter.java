@@ -11,6 +11,7 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.SignatureException;
@@ -60,7 +61,7 @@ public class JwtAuthenticationFilter implements GlobalFilter {
 
                 ServerHttpRequest modifiedRequest = request.mutate()
                         .header("X-User-Id", userId)
-                        .header("X-User-Role", "ROLE_" + role)
+                        .header("X-User-Role", role)
                         .build();
 
                 return chain.filter(exchange.mutate().request(modifiedRequest).build());

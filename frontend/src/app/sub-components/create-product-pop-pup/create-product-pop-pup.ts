@@ -67,19 +67,33 @@ export class CreateProductPopPup {
     const file = this.selectedImage();
     if (!file) return;
 
-    this.productsService.createProduct(this.product).subscribe({
+    // Step 1: Upload the image
+    this.mediaSevice.uploadProductImage(file).subscribe({
       next: (res: any) => {
-        this.createdProduct.emit(res.data);
+        // Step 2: Set the uploaded image URL in the product
+        this.product.image = res;
+
+        // Step 3: Create the product
+        this.productsService.createProduct(this.product).subscribe({
+          next: (res: any) => {
+            this.createdProduct.emit(res.data);
+          },
+          error: (err) => {
+            console.error('Error creating product:', err);
+          }
+        });
+
       },
       error: (err) => {
-        console.error(err);
+        console.error('Error uploading image:', err);
       }
     });
-  
   }
 
 
-  close() {
-    this.closePopUp.emit();
-  }
+
+
+close() {
+  this.closePopUp.emit();
+}
 }

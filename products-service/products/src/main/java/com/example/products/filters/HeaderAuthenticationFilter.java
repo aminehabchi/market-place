@@ -3,21 +3,20 @@ package com.example.products.filters;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.example.shared.common.types.Role;
+import com.mongodb.lang.NonNull;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import org.springframework.core.annotation.Order;
-
-import com.example.shared.common.types.Role;
-import com.mongodb.lang.NonNull;
 
 @Order(1)
 @Component
@@ -31,8 +30,9 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String userId = request.getHeader("X-User-Id");
-        String roleHeader = request.getHeader("X-User-Role");
+        String roleHeader = "ROLE_" + request.getHeader("X-User-Role");
 
+        System.out.println("----> " + request.getRequestURL().toString());
         System.out.println("userId ========> " + userId);
         System.out.println("role ========> " + roleHeader);
 
@@ -41,8 +41,9 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
+        System.out.println(" ---- ================ " + roleHeader);
         Role role = Role.fromString(roleHeader);
+        System.out.println(" ++++ ================ " + role);
 
         // Only parse UUID for roles that need it
         if (role.isBuyer() || role.isSeller() || role.isAdmin()) {
@@ -57,7 +58,7 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            var authorities = List.of(new SimpleGrantedAuthority(role.name()));
+            var authorities = List.of(new SimpleGrantedAuthority(roleHeader));
 
             var authentication = new UsernamePasswordAuthenticationToken(
                     userId, // null for guest
@@ -66,7 +67,7 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
- 
+        System.out.println("Authorities: " + SecurityContextHolder.getContext().getAuthentication().getAuthorities());
         filterChain.doFilter(request, response);
     }
 }
