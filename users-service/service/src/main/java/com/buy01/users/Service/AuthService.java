@@ -31,20 +31,21 @@ public class AuthService {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public RegisterResDTOs register(RegisterReqDTOs req, MultipartFile avatar) {
+    public RegisterResDTOs register(RegisterReqDTOs req) {
         Role role = normalizeRole(req.role());
         boolean exist = userRepository.existsByEmail(req.email());
         if (exist) {
             throw new UserExistException("Invalid Email");
         }
-        String avatarUrl = null;
-        if (avatar != null && !avatar.isEmpty()) {
-            avatarUrl = "/uploads/" + UUID.randomUUID().toString() + avatar.getOriginalFilename();
-        }
+        // String avatarUrl = null;
+        // if (avatar != null && !avatar.isEmpty()) {
+        // avatarUrl = "/uploads/" + UUID.randomUUID().toString() +
+        // avatar.getOriginalFilename();
+        // }
         User user = new User(null, req.name(), req.email(), passwordEncoder.encode(req.password()),
                 role.toString().substring(5), avatarUrl);
         userRepository.save(user);
-        KafkaUserCreatedEvent event = new KafkaUserCreatedEvent(null,  user.name());
+        KafkaUserCreatedEvent event = new KafkaUserCreatedEvent(null, user.email(), user.name(), avatar);
         kafkaTemplate.send("create-user-events", null, event);
         return new RegisterResDTOs("user created");
     }

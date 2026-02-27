@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, from, switchMap, throwError } from 'rxjs';
 
 export interface LoginPayload {
   identification: string;
@@ -13,24 +13,31 @@ export interface LoginResponse {
   message: string;
 }
 
+export interface avatarUpdate {
+  oldAvatar: string;
+  newAvatar: string;
+}
+
 export interface RegisterPayload {
   email: string;
   name: string;
   password: string;
   role: string;
+  avatarUrl: string;
 }
 
 export interface Me {
+  id: string;
+  username: string;
   email: string;
-  name: string;
-  password: string;
   role: string;
-  avatar: File;
+  avatarUrl: string;
 }
 
 export interface UpdateProfile {
   name: string;
-  password: string;
+  email: string;
+  avatarUrl: string;
 }
 
 export interface Response {
@@ -43,6 +50,7 @@ export interface Response {
 export class UsersService {
   private readonly loginPath = '/api/users/login';
   private readonly registerPath = '/api/users/register';
+  private readonly mediaPath = '/api/media/users';
 
   constructor(private http: HttpClient) { }
 
@@ -55,42 +63,54 @@ export class UsersService {
   }
 
   registerUser(userData: RegisterPayload): Observable<Response> {
-    const formData = new FormData();
-    const infoBlob = new Blob([JSON.stringify(userData)], {
-      type: 'application/json'
-    });
+    // const formData = new FormData();
+    // const infoBlob = new Blob([JSON.stringify(userData)], {
+    //   type: 'application/json'
+    // });
 
-    formData.append('info', infoBlob);
+    // formData.append('info', infoBlob);
 
-    return this.http.post<Response>(this.registerPath, formData);
+    return this.http.post<Response>(this.registerPath, userData);
   }
 
-  registerUserWithAvatar(userData: RegisterPayload, avatar?: File | null): Observable<Response> {
-    const formData = new FormData();
-    const infoBlob = new Blob([JSON.stringify(userData)], {
-      type: 'application/json'
+  getAvatar(avatar: string): Observable<Blob> {
+    return this.http.get(`${this.mediaPath}/${avatar}`, {
+      responseType: 'blob',
     });
+  }
 
-    formData.append('info', infoBlob);
+  registerUserWithAvatar(avatar?: File | null): Observable<Response> {
+    const formData = new FormData();
+    // const infoBlob = new Blob([JSON.stringify(userData)], {
+    //   type: 'application/json'
+    // });
+
+    // formData.append('info', infoBlob);
     if (avatar) {
       formData.append('avatar', avatar, avatar.name);
     }
 
-    return this.http.post<Response>(this.registerPath, formData);
+    return this.http.post<Response>(this.mediaPath, formData);
   }
 
-  updateUser(userData: UpdateProfile, avatar?: File | null): Observable<Response> {
-    const formData = new FormData();
-    const infoBlob = new Blob([JSON.stringify(userData)], {
-      type: 'application/json'
-    });
+  updateUser(userData: UpdateProfile): Observable<Me> {
+    return this.http.put<Me>(`/api/users/me`, userData);
+  }
 
-    formData.append('info', infoBlob);
-    if (avatar) {
-      formData.append('avatar', avatar, avatar.name);
+  updateAvatar(avatar: File | null): Observable<string> {
+    if (!avatar) {
+      return throwError(() => new Error('No avatar file provided'));
     }
 
-    return this.http.post<Response>(this.registerPath, formData);
+    return from(avatar.arrayBuffer()).pipe(
+      switchMap((bytes) => {
+        const headers = new HttpHeaders({
+          'Content-Type': avatar.type || 'application/octet-stream',
+        });
+
+        return this.http.post<string>(`${this.mediaPath}/`, bytes, { headers });
+      })
+    );
   }
 
   logeUser(userData: LoginPayload): Observable<LoginResponse> {

@@ -5,14 +5,14 @@ import { NotFound } from './pages/not-found/not-found';
 import { Login } from './pages/login/login';
 import { Register } from './pages/register/register';
 import { Profile } from './pages/profile/profile';
-import { guestOnlyGuard } from './core/guards/auth.guard';
+import { guestOnlyGuard, authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
     { path: '', component: Home },
     { path: 'dashboard', component: SellerDashboard },
     { path: 'login', component: Login, canActivate: [guestOnlyGuard] },
     { path: 'register', component: Register, canActivate: [guestOnlyGuard] },
-    { path: 'profile', component: Profile },
+    { path: 'profile', component: Profile, canActivate: [authGuard] },
     { path: 'not-found', component: NotFound },
     { path: '**', redirectTo: 'not-found' }
 ];
