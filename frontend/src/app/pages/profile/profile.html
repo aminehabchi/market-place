@@ -82,6 +82,9 @@
                     <input id="avatar" name="avatar" type="file" accept="image/*" (change)="onAvatarSelected($event)" />
                 </div>
 
+                <div>
+                </div>
+
                 @if (successMessage()) {
                 <p class="feedback success">{{ successMessage() }}</p>
                 }
@@ -97,6 +100,7 @@
                     <button type="button" (click)="toggleEdit()" [disabled]="isSubmitting()" class="cancel-btn">
                         Cancel
                     </button>
+                    <button type="button" (click)="onDeleteUser()" [disabled]="isSubmitting()" class="delete-btn">Delete User</button>
                 </div>
             </form>
             }

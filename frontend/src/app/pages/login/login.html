@@ -18,8 +18,8 @@
                     placeholder="••••••••" />
             </div>
 
-            <button type="submit" [disabled]="isSubmitting || loginForm.invalid">
-                {{ isSubmitting ? 'Signing in...' : 'Login' }}
+            <button type="submit" [disabled]="isSubmitting() || loginForm.invalid">
+                {{ isSubmitting() ? 'Signing in...' : 'Login' }}
             </button>
         </form>
 
@@ -27,8 +27,8 @@
         <p class="feedback success">{{ message }}</p>
         }
 
-        @if (errorMessage) {
-        <p class="feedback error">{{ errorMessage }}</p>
+        @if (errorMessage()) {
+        <p class="feedback error">{{ errorMessage() }}</p>
         }
 
         <p class="auth-footer">

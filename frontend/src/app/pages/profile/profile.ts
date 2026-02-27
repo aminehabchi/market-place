@@ -62,7 +62,7 @@ export class Profile implements OnInit, OnDestroy {
         this.profileAvatarSrc.set(objectUrl);
       },
       error: (err) => {
-        console.error("err: ==============> ",  err);
+        console.error("err: ==============> ", err);
       }
     });
   }
@@ -155,5 +155,38 @@ export class Profile implements OnInit, OnDestroy {
             this.isSubmitting.set(false);
           }
         });
+  }
+
+  onDeleteUser() {
+    if (this.isSubmitting()) {
+      return;
+    }
+
+    if (!confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+      return;
+    }
+
+    this.isSubmitting.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
+
+    this.userService.deleteUser().subscribe({
+      next: (res) => {
+        this.successMessage.set(res.msg || 'Account deleted successfully.');
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('role');
+        }
+        this.isSubmitting.set(false);
+        this.router.navigateByUrl('/login');
+      },
+      error: (err) => {
+        this.isSubmitting.set(false);
+        this.errorMessage.set(
+          err?.error?.message || err?.error?.msg || 'Failed to delete user. Please try again.'
+        );
+        console.error("user has not been deleted ", err);
+      }
+    });
   }
 }

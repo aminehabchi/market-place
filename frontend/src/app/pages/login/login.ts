@@ -1,5 +1,5 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, Inject, PLATFORM_ID, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UsersService } from '../../core/services/users-service';
@@ -13,8 +13,11 @@ import { UsersService } from '../../core/services/users-service';
 })
 export class Login {
   message = '';
-  errorMessage = '';
-  isSubmitting = false;
+  // errorMessage = '';
+  errorMessage = signal("");
+  // isSubmitting = false;
+  isSubmitting = signal(false);
+
   user = {
     identification: '',
     password: ''
@@ -27,13 +30,14 @@ export class Login {
   ) { }
 
   onSubmit(form: NgForm): void {
-    if (form.invalid || this.isSubmitting) {
+    if (form.invalid || this.isSubmitting()) {
       return;
     }
 
-    this.isSubmitting = true;
+    this.isSubmitting.set(true)
     this.message = '';
-    this.errorMessage = '';
+    // this.errorMessage = '';
+    this.errorMessage.set("");
 
     this.loginService.loginUser(this.user).subscribe({
       next: (res) => {
@@ -44,12 +48,17 @@ export class Login {
         }
 
         form.resetForm({ identification: '', password: '' });
-        this.isSubmitting = false;
+        // this.isSubmitting = false;
+        this.isSubmitting.set(false)
         this.router.navigateByUrl('/');
       },
       error: (err) => {
-        this.errorMessage = err?.error?.message || err?.error?.msg || 'Login failed. Please verify your credentials.';
-        this.isSubmitting = false;
+        // this.errorMessage = err?.error?.message || err?.error?.msg || 'Login failed. Please verify your credentials.';
+        // this.isSubmitting = false;
+        console.error("error ll");
+        
+        this.errorMessage.set(err?.error?.message || err?.error?.msg || 'Login failed. Please verify your credentials.');
+        this.isSubmitting.set(false)
       }
     });
   }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.buy01.users.DTOs.ProfileResDTOs;
 import com.buy01.users.DTOs.ProfileUpdateReqDTOs;
+import com.buy01.users.DTOs.RegisterResDTOs;
 import com.buy01.users.Entity.User;
 import com.buy01.users.Repository.UserRepository;
 import com.example.shared.common.kafka.dtos.users.KafkaUserUpdatedEvent;
@@ -60,5 +61,16 @@ public class ProfileService {
         System.out.println("====================== " + authName);
         return userRepository.findById(authName)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found 1"));
+    }
+
+    public RegisterResDTOs deleteCurrentUser() {
+        String authName = SecurityContextHolder.getContext().getAuthentication().getName();
+        boolean exist = userRepository.existsById(authName);
+        System.out.println("============ existe ============= " + exist);
+        if (exist) {
+            userRepository.deleteById(authName);
+            return new RegisterResDTOs("user deleted successfully");
+        }
+        throw new UsernameNotFoundException("User not found");
     }
 }
