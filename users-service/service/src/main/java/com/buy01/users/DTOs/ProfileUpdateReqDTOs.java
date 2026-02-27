@@ -5,5 +5,5 @@ import java.util.UUID;
 public record ProfileUpdateReqDTOs(
                 String name,
                 String email,
-                UUID UUID) {
+                UUID uuid) {
 }

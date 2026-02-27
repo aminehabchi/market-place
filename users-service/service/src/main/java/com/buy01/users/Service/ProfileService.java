@@ -1,5 +1,7 @@
 package com.buy01.users.Service;
 
+import java.util.UUID;
+
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -32,13 +34,13 @@ public class ProfileService {
 
         String updatedName = req.name() == null || req.name().isBlank() ? user.name() : req.name();
         String updatedEmail = req.email() == null || req.email().isBlank() ? user.email() : req.email();
-        String updatedAvatarUrl = user.avatarUrl();
+        UUID updatedAvatarUrl = user.avatarUrl();
 
-        if (req.avatarUrl() != null && !req.avatarUrl().isBlank()) {
+        if (req.uuid() != null) {
             if (!"SELLER".equalsIgnoreCase(user.role())) {
                 throw new IllegalArgumentException("Only SELLER can update avatar");
             }
-            updatedAvatarUrl = req.avatarUrl();
+            updatedAvatarUrl = req.uuid();
         }
 
         User updated = new User(
