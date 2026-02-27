@@ -40,7 +40,7 @@ export interface UpdateProfile {
   avatarUrl: string;
 }
 
-export interface Response {
+export interface ApiMessageResponse {
   msg: string;
 }
 
@@ -51,6 +51,7 @@ export class UsersService {
   private readonly loginPath = '/api/users/login';
   private readonly registerPath = '/api/users/register';
   private readonly mediaPath = '/api/media/users';
+  private readonly deletePath = '/api/users/me'
 
   constructor(private http: HttpClient) { }
 
@@ -62,7 +63,7 @@ export class UsersService {
     return this.http.get<Me>(`/api/users/me`);
   }
 
-  registerUser(userData: RegisterPayload): Observable<Response> {
+  registerUser(userData: RegisterPayload): Observable<ApiMessageResponse> {
     // const formData = new FormData();
     // const infoBlob = new Blob([JSON.stringify(userData)], {
     //   type: 'application/json'
@@ -70,7 +71,7 @@ export class UsersService {
 
     // formData.append('info', infoBlob);
 
-    return this.http.post<Response>(this.registerPath, userData);
+    return this.http.post<ApiMessageResponse>(this.registerPath, userData);
   }
 
   getAvatar(avatar: string): Observable<Blob> {
@@ -79,7 +80,7 @@ export class UsersService {
     });
   }
 
-  registerUserWithAvatar(avatar?: File | null): Observable<Response> {
+  registerUserWithAvatar(avatar?: File | null): Observable<ApiMessageResponse> {
     const formData = new FormData();
     // const infoBlob = new Blob([JSON.stringify(userData)], {
     //   type: 'application/json'
@@ -90,7 +91,7 @@ export class UsersService {
       formData.append('avatar', avatar, avatar.name);
     }
 
-    return this.http.post<Response>(this.mediaPath, formData);
+    return this.http.post<ApiMessageResponse>(this.mediaPath, formData);
   }
 
   updateUser(userData: UpdateProfile): Observable<Me> {
@@ -115,5 +116,9 @@ export class UsersService {
 
   logeUser(userData: LoginPayload): Observable<LoginResponse> {
     return this.loginUser(userData);
+  }
+
+  deleteUser() {
+    return this.http.delete<ApiMessageResponse>(`${this.deletePath}`);
   }
 }
