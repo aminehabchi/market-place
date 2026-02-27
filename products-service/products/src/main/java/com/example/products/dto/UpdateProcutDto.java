@@ -1,5 +1,7 @@
 package com.example.products.dto;
 
+import java.util.UUID;
+
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -15,5 +17,5 @@ public class UpdateProcutDto {
     @Positive(message = "Price must be greater than 0")
     private Double price;
 
-    private String image;
+    private UUID image;
 }

@@ -3,6 +3,7 @@ package com.example.media.kafka;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import com.example.media.models.ProductImage;
 import com.example.media.services.ProductImageService;
 import com.example.shared.common.kafka.dtos.media.KafkaConfirmImageEvent;
 
@@ -19,5 +20,12 @@ public class ProductImagesEvents {
     public void listenConfirmAvatar(KafkaConfirmImageEvent object) {
 
         this.productImageService.confirmImage(object.id());
+    }
+
+    @KafkaListener(topics = "delete-image-events", groupId = "media-group")
+    public void listenDeleteAvatar(KafkaConfirmImageEvent object) {
+
+        ProductImage i = this.productImageService.getAvatarbyId(object.id());
+        this.productImageService.deleteImage(i);
     }
 }

@@ -4,11 +4,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.products.kafka.MediaEvents;
 import com.example.products.models.Product;
 import com.example.products.models.User;
-import com.example.shared.common.kafkaDtos.KafkaUserCreatedEvent;
-import com.example.shared.common.kafkaDtos.KafkaUserUpdatedEvent;
-import com.example.shared.common.kafkaDtos.KafkaUserRemovedEvent;
+import com.example.shared.common.kafka.dtos.users.*;
 
 import com.example.products.repositories.ProductRepository;
 
@@ -19,10 +18,12 @@ public class UsersService {
 
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final MediaEvents mediaEvents;
 
-    public UsersService(ProductRepository productRepository, UserRepository userRepository) {
+    public UsersService(ProductRepository productRepository, UserRepository userRepository, MediaEvents mediaEvents) {
         this.productRepository = productRepository;
         this.userRepository = userRepository;
+        this.mediaEvents = mediaEvents;
     }
 
     public void createUser(KafkaUserCreatedEvent obj) {
@@ -31,18 +32,16 @@ public class UsersService {
     }
 
     public void updateUser(KafkaUserUpdatedEvent obj) {
-        User u = this.userRepository.findAllById(obj.userId());
+        User u = this.userRepository.findById(obj.userId()).orElse(null);
+        ;
         u.update(obj);
         this.userRepository.save(u);
     }
 
     public void deleteUser(KafkaUserRemovedEvent obj) {
         List<Product> products = this.productRepository.findByUserId(obj.userId());
-
         for (Product p : products) {
-            // *********************************//
-            //  must send event to media sevice 
-            // *********************************//
+            this.mediaEvents.deleteImageEvent(p.getImage());
         }
 
         this.productRepository.deleteByUserId(obj.userId());

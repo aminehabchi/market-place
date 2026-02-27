@@ -1,5 +1,7 @@
 package com.buy01.users.Entity;
 
+import java.util.UUID;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,7 +14,7 @@ public record User(
         String email,
         @JsonIgnore String password,
         String role,
-        String avatarUrl) {
+        UUID avatarUrl) {
     public User {
         if (role == null) {
             role = "CLIENT";

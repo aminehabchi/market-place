@@ -5,8 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.products.models.Product;
 
-import com.example.shared.common.kafka.dtos.products.KafkaProductRemovedEvent;
-import com.example.shared.common.kafka.dtos.products.KafkaProductCreatedEvent;
+import com.example.shared.common.kafka.dtos.products.*;
 
 @Service
 public class ProductEvents {
@@ -18,12 +17,12 @@ public class ProductEvents {
     }
 
     public void sendCreateEvent(Product p) {
-        KafkaProductCreatedEvent event = new KafkaProductCreatedEvent(p.id());
+        KafkaProductCreatedEvent event = new KafkaProductCreatedEvent(p.getId(), p.getUserId());
         kafkaTemplate.send("create-product-events", null, event);
     }
 
     public void sendRemoveEvent(Product p) {
-        KafkaProductRemovedEvent event = new KafkaProductRemovedEvent(p.id());
+        KafkaProductRemovedEvent event = new KafkaProductRemovedEvent(p.getId());
         kafkaTemplate.send("remove-product-events", null, event);
     }
 }

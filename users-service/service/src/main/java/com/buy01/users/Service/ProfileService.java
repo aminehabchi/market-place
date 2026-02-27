@@ -9,7 +9,6 @@ import com.buy01.users.DTOs.ProfileResDTOs;
 import com.buy01.users.DTOs.ProfileUpdateReqDTOs;
 import com.buy01.users.Entity.User;
 import com.buy01.users.Repository.UserRepository;
-// import com.example.shared.common.kafkaDtos.KafkaUserUpdatedEvent;
 import com.example.shared.common.kafka.dtos.users.KafkaUserUpdatedEvent;
 
 @Service

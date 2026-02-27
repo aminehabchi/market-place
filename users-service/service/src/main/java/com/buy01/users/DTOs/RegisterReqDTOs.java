@@ -1,5 +1,7 @@
 package com.buy01.users.DTOs;
 
+import java.util.UUID;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -10,5 +12,5 @@ public record RegisterReqDTOs(
 		@NotBlank(message = "Name is required") @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters") String name,
 		@NotBlank(message = "Password is required") @Size(min = 6, max = 30, message = "Password must be at least 6 characters") String password,
 		@Pattern(regexp = "(?i)^(CLIENT|BUYER|SELLER|GUEST)$", message = "Invalid role. Use CLIENT, BUYER, SELLER, ADMIN, or GUEST") String role,
-		String avatarUrl) {
+		UUID avatarUrl) {
 }

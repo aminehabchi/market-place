@@ -1,5 +1,6 @@
 package com.example.media.repositories;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -9,5 +10,5 @@ import com.example.media.models.Product;
 
 @Repository
 public interface ProductRepository extends MongoRepository<Product, UUID> {
-
+    void deleteByUserId(String userId);
 }

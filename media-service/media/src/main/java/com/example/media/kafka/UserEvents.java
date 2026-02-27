@@ -19,12 +19,12 @@ public class UserEvents {
         this.avatarService = avatarService;
     }
 
-    @KafkaListener(topics = "create-user-events", groupId = "products-group")
+    @KafkaListener(topics = "create-user-events", groupId = "media-group")
     public void listenCreateUser(KafkaUserCreatedEvent object) {
         this.usersService.createUser(object);
     }
 
-    @KafkaListener(topics = "remove-user-events", groupId = "products-group")
+    @KafkaListener(topics = "remove-user-events", groupId = "media-group")
     public void listenRemoveUser(KafkaUserRemovedEvent object) {
 
         this.avatarService.deleteAvatarByUserId(object.userId());

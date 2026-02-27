@@ -60,7 +60,7 @@ public class JwtAuthenticationFilter implements GlobalFilter {
 
                 ServerHttpRequest modifiedRequest = request.mutate()
                         .header("X-User-Id", userId)
-                        .header("X-User-Role", role)
+                        .header("X-User-Role", "ROLE_" + role)
                         .build();
 
                 return chain.filter(exchange.mutate().request(modifiedRequest).build());

@@ -1,8 +1,10 @@
 package com.example.products.models;
 
+import java.util.UUID;
+
 import com.example.shared.common.types.Role;
-import com.example.shared.common.kafkaDtos.KafkaUserCreatedEvent;
-import com.example.shared.common.kafkaDtos.KafkaUserUpdatedEvent;
+import com.example.shared.common.kafka.dtos.users.*;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,7 +18,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "products")
+@Document(collection = "users")
 public class User {
 
     @Id
@@ -25,20 +27,18 @@ public class User {
     @Indexed(unique = true)
     String username;
 
-    String avatar;
+    UUID avatar;
 
     Role role;
 
     public User(KafkaUserCreatedEvent u) {
-        this.id = u.id();
+        this.id = u.userId();
         this.username = u.username();
         this.avatar = u.avatar();
-        this.role = u.role();
     }
 
     public void update(KafkaUserUpdatedEvent u) {
         this.username = u.username();
-        this.avatar = u.avatar();
-        this.role = u.role();
+        this.avatar = u.newAvatar();
     }
 }
