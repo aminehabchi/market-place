@@ -13,6 +13,7 @@ import com.buy01.users.DTOs.RegisterResDTOs;
 import com.buy01.users.Entity.User;
 import com.buy01.users.Repository.UserRepository;
 import com.example.shared.common.kafka.dtos.users.KafkaUserUpdatedEvent;
+import com.example.shared.common.kafka.dtos.users.KafkaUserRemovedEvent;
 
 @Service
 public class ProfileService {
@@ -79,6 +80,8 @@ public class ProfileService {
         System.out.println("============ existe ============= " + exist);
         if (exist) {
             userRepository.deleteById(authName);
+            KafkaUserRemovedEvent event = new KafkaUserRemovedEvent(authName);
+            kafkaTemplate.send("remove-user-events", null, event);
             return new RegisterResDTOs("user deleted successfully");
         }
         throw new UsernameNotFoundException("User not found");

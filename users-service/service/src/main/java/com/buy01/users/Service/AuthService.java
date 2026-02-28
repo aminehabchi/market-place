@@ -49,9 +49,11 @@ public class AuthService {
                 role.toString().substring(5), avatarUUID);
 
         user = userRepository.save(user);
-
+        UUID avatar = (user.avatarUrl() != null && !user.avatarUrl().isBlank())
+                ? UUID.fromString(user.avatarUrl())
+                : null;
         KafkaUserCreatedEvent event = new KafkaUserCreatedEvent(user.id(), user.name(),
-                UUID.fromString(user.avatarUrl()));
+                avatar);
 
         kafkaTemplate.send("create-user-events", null, event);
 
