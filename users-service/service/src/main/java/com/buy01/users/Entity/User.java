@@ -14,7 +14,7 @@ public record User(
         String email,
         @JsonIgnore String password,
         String role,
-        UUID avatarUrl) {
+        String avatarUrl) {
     public User {
         if (role == null) {
             role = "CLIENT";

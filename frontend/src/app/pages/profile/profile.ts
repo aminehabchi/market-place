@@ -57,7 +57,8 @@ export class Profile implements OnInit, OnDestroy {
         if (this.profileAvatarSrc()) {
           URL.revokeObjectURL(this.profileAvatarSrc());
         }
-
+        console.log("profile image");
+        
         const objectUrl = URL.createObjectURL(res);
         this.profileAvatarSrc.set(objectUrl);
       },
@@ -79,6 +80,8 @@ export class Profile implements OnInit, OnDestroy {
         this.editFormName.set(res.username);
         this.editFormEmail.set(res.email);
         this.editFormAvatarUrl.set(res.avatarUrl || '');
+        console.log(res);
+        
         this.loadProfileImg(res.avatarUrl);
         this.isLoading.set(false);
       },
@@ -138,7 +141,7 @@ export class Profile implements OnInit, OnDestroy {
             const updateData: UpdateProfile = {
               name: this.editFormName(),
               email: this.editFormEmail(),
-              avatarUrl: avatarIdOrUrl,
+              uuid: avatarIdOrUrl,
             };
             return this.userService.updateUser(updateData);
           })
