@@ -40,13 +40,18 @@ public class AuthService {
         if (exist) {
             throw new UserExistException("Invalid Email");
         }
-
+        String avatarUUID = null;
+        if (req.avatarUrl() != null) {
+            avatarUUID = req.avatarUrl().toString();
+        }
+        System.out.println(req.name() + " -----------------------------------");
         User user = new User(null, req.name(), req.email(), passwordEncoder.encode(req.password()),
-                role.toString().substring(5), req.avatarUrl());
+                role.toString().substring(5), avatarUUID);
 
         user = userRepository.save(user);
 
-        KafkaUserCreatedEvent event = new KafkaUserCreatedEvent(user.id(), user.name(), user.avatarUrl());
+        KafkaUserCreatedEvent event = new KafkaUserCreatedEvent(user.id(), user.name(),
+                UUID.fromString(user.avatarUrl()));
 
         kafkaTemplate.send("create-user-events", null, event);
 

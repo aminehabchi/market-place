@@ -26,6 +26,7 @@ public class ProfileService {
 
     public ProfileResDTOs getCurrentProfile() {
         User user = getAuthenticatedUser();
+        System.out.println("name ============ " + user.name());
         return new ProfileResDTOs(user.id(), user.name(), user.email(), user.role(), user.avatarUrl());
     }
 
@@ -34,7 +35,12 @@ public class ProfileService {
 
         String updatedName = req.name() == null || req.name().isBlank() ? user.name() : req.name();
         String updatedEmail = req.email() == null || req.email().isBlank() ? user.email() : req.email();
-        UUID updatedAvatarUrl = user.avatarUrl();
+        UUID updatedAvatarUrl = (user.avatarUrl() != null && !user.avatarUrl().isBlank())
+                ? UUID.fromString(user.avatarUrl())
+                : null;
+        UUID oldAvatarUrl = (user.avatarUrl() != null && !user.avatarUrl().isBlank())
+                ? UUID.fromString(user.avatarUrl())
+                : null;
 
         if (req.uuid() != null) {
             if (!"SELLER".equalsIgnoreCase(user.role())) {
@@ -49,13 +55,15 @@ public class ProfileService {
                 updatedEmail,
                 user.password(),
                 user.role(),
-                updatedAvatarUrl);
+                updatedAvatarUrl.toString());
 
+        System.out.println("avatar ==================== " + req.uuid());
         User newUser = userRepository.save(updated);
-        KafkaUserUpdatedEvent event = new KafkaUserUpdatedEvent(newUser.id(), newUser.name(), user.avatarUrl(),
+        KafkaUserUpdatedEvent event = new KafkaUserUpdatedEvent(newUser.id(), newUser.name(),
+                oldAvatarUrl,
                 updatedAvatarUrl);
         kafkaTemplate.send("update-user-events", null, event);
-        return new ProfileResDTOs(updated.id(), updated.name(), updated.email(), updated.role(), updated.avatarUrl());
+        return new ProfileResDTOs(newUser.id(), newUser.name(), newUser.email(), newUser.role(), newUser.avatarUrl());
     }
 
     private User getAuthenticatedUser() {

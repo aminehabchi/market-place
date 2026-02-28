@@ -37,7 +37,7 @@ export interface Me {
 export interface UpdateProfile {
   name: string;
   email: string;
-  avatarUrl: string;
+  uuid: string;
 }
 
 export interface ApiMessageResponse {
