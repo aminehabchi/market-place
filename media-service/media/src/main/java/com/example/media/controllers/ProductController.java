@@ -2,6 +2,7 @@ package com.example.media.controllers;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.HttpHeaders;
@@ -45,12 +46,13 @@ public class ProductController {
             @RequestBody byte[] fileBytes,
             @RequestHeader("Content-Type") String mimeType, Authentication authentication) throws Exception {
 
-    
         String userId = (String) authentication.getPrincipal();
 
         ProductImage avatar = productImageService.uploadAvatar(
                 new ByteArrayInputStream(fileBytes),
                 mimeType, userId);
+
+        System.out.println("Image uploaded =====> " + avatar.getId());
 
         return ResponseEntity.ok(avatar.getId());
     }
@@ -77,11 +79,15 @@ public class ProductController {
 
     @GetMapping("/{id}")
     @PermitAll
-    public ResponseEntity<byte[]> getImage(@PathVariable UUID id)
-            throws Exception {
+    public ResponseEntity<byte[]> getImage(@PathVariable UUID id) throws Exception {
 
-        ProductImage image = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Image not found"));
+        Optional<ProductImage> optionalImage = repository.findById(id);
+
+        if (optionalImage.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        ProductImage image = optionalImage.get();
 
         try (InputStream is = contentStore.getContent(image)) {
 

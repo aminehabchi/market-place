@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProductsService } from '../../core/services/products-service';
 import { FormsModule } from '@angular/forms';
+import { MediaSevice } from '../../core/services/media-sevice';
 
 @Component({
   selector: 'app-product',
@@ -24,7 +25,7 @@ export class ProductItem {
   isMyProduct: boolean = false;
   isEditing = false;
 
-  constructor(private router: Router, private producteService: ProductsService) { }
+  constructor(private router: Router, private producteService: ProductsService, private mediaSevice: MediaSevice) { }
 
   ngOnInit() {
     this.updatedProduct = structuredClone(this.product);
@@ -61,16 +62,47 @@ export class ProductItem {
 
 
   save() {
-    this.producteService.updateProduct(this.product.id, this.updatedProduct).subscribe({
-      next: () => {
-        this.product = structuredClone(this.updatedProduct);
-        this.closeUpdate()
-      },
-      error: (err) => {
-        console.error('Error update product:', err);
-        alert('Failed to delete product. Please try again.');
-      },
-    });
+    const file = this.selectedImage();
+
+    if (file) {
+      // Step 1: Upload image
+      this.mediaSevice.uploadProductImage(file).subscribe({
+        next: (imageUrl: any) => {
+          console.log(imageUrl);
+          
+          // Step 2: Set the uploaded image URL in the updated product
+          this.updatedProduct.image = imageUrl;
+
+          // Step 3: Update the product with new image
+          this.producteService.updateProduct(this.product.id, this.updatedProduct).subscribe({
+            next: () => {
+              this.product = structuredClone(this.updatedProduct);
+              this.closeUpdate();
+            },
+            error: (err) => {
+              console.error('Error updating product:', err);
+              alert('Failed to update product. Please try again.');
+            }
+          });
+        },
+        error: (err) => {
+          console.error('Error uploading image:', err);
+          alert('Failed to upload image. Please try again.');
+        }
+      });
+    } else {
+      // No new image selected, just update the product
+      this.producteService.updateProduct(this.product.id, this.updatedProduct).subscribe({
+        next: () => {
+          this.product = structuredClone(this.updatedProduct);
+          this.closeUpdate();
+        },
+        error: (err) => {
+          console.error('Error updating product:', err);
+          alert('Failed to update product. Please try again.');
+        }
+      });
+    }
   }
 
   cancel() {

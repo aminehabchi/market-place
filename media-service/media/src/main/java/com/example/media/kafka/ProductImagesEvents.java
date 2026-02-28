@@ -19,11 +19,15 @@ public class ProductImagesEvents {
     @KafkaListener(topics = "confirm-image-events", groupId = "media-group")
     public void listenConfirmAvatar(KafkaConfirmImageEvent object) {
 
+        System.out.println("Confirme Image ==============> " + object.id());
+
         this.productImageService.confirmImage(object.id());
     }
 
     @KafkaListener(topics = "delete-image-events", groupId = "media-group")
     public void listenDeleteAvatar(KafkaConfirmImageEvent object) {
+
+        System.out.println("Delete Image ==============> " + object.id());
 
         ProductImage i = this.productImageService.getAvatarbyId(object.id());
         this.productImageService.deleteImage(i);

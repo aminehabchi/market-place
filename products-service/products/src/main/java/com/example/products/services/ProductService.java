@@ -59,9 +59,11 @@ public class ProductService {
         }
 
         if (productDto.getImage() != null && !productDto.getImage().equals(product.getImage())) {
-            product.setImage(productDto.getImage());
+            System.out.println("img 11 ==>" + productDto.getImage());
+            System.out.println("img 22 ==>" + product.getImage());
             this.mediaEvents.confimImageEvent(productDto.getImage());
             this.mediaEvents.deleteImageEvent(product.getImage());
+            product.setImage(productDto.getImage());
         }
 
         return productRepository.save(product);
