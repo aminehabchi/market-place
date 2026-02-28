@@ -3,7 +3,7 @@ import { Component, Inject, PLATFORM_ID, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UsersService } from '../../core/services/users-service';
-
+import { StateService } from '../../core/services/state-service';
 
 @Component({
   selector: 'app-login',
@@ -25,6 +25,7 @@ export class Login {
 
   constructor(
     private loginService: UsersService,
+    private StateService: StateService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: object
   ) { }
@@ -47,6 +48,8 @@ export class Login {
           localStorage.setItem('role', res.role);
         }
 
+        this.StateService.getMyInfo();
+
         form.resetForm({ identification: '', password: '' });
         // this.isSubmitting = false;
         this.isSubmitting.set(false)
@@ -56,7 +59,7 @@ export class Login {
         // this.errorMessage = err?.error?.message || err?.error?.msg || 'Login failed. Please verify your credentials.';
         // this.isSubmitting = false;
         console.error("error ll");
-        
+
         this.errorMessage.set(err?.error?.message || err?.error?.msg || 'Login failed. Please verify your credentials.');
         this.isSubmitting.set(false)
       }

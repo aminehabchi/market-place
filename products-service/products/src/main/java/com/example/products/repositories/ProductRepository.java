@@ -10,6 +10,7 @@ import com.example.products.models.Product;
 
 @Repository
 public interface ProductRepository extends MongoRepository<Product, UUID> {
+    List<Product> findAllByUserIdOrderByCreatedAtDesc(String userId);
 
     List<Product> findAllByOrderByCreatedAtDesc();
 

@@ -18,7 +18,7 @@ export class SellerDashboard {
   constructor(private productsService: ProductsService) { }
 
   ngOnInit() {
-    this.productsService.getAllProducts().subscribe({
+    this.productsService.getMyProducts().subscribe({
       next: (res: any) => {
         this.products.set(res.data);
       },

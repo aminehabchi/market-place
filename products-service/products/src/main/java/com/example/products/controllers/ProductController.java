@@ -44,8 +44,10 @@ public class ProductController {
 
     @GetMapping("/me")
     @PermitAll
-    public ResponseEntity<ApiResponse<List<Product>>> getMyProducts() {
-        return ResponseEntity.ok(ApiResponse.success(productService.getAllProducts()));
+    public ResponseEntity<ApiResponse<List<Product>>> getMyProducts(Authentication authentication) {
+        String userId = (String) authentication.getPrincipal();
+
+        return ResponseEntity.ok(ApiResponse.success(productService.getMyProducts(userId)));
     }
 
     @GetMapping("/{id}")
