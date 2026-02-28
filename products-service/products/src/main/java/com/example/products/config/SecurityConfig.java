@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Public product listing (GET /api/products)
-                        .requestMatchers(HttpMethod.GET, "/api/products/**")
+                        .requestMatchers(HttpMethod.GET, "/api/products/")
                         .hasAnyRole("GUEST", "BUYER", "SELLER", "ADMIN")
 
                         // Actuator only for admin

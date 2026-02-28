@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter implements GlobalFilter {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             System.out.println("logs ============================================ Guest");
             ServerHttpRequest modifiedRequest = request.mutate()
-                    .header("X-User-Role", "ROLE_GUEST")
+                    .header("X-User-Role", "GUEST")
                     .build();
             return chain.filter(exchange.mutate().request(modifiedRequest).build());
         } else {
