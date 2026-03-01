@@ -1,0 +1,15 @@
+services:
+  config-server:
+    build:
+      context: ./config
+    container_name: config-server
+    ports:
+      - "8761:8761"
+    environment:
+      DISCOVERY : http://eureka-server:8761/eureka
+    networks:
+      - shared-net
+
+networks:
+  shared-net:
+    external: true
