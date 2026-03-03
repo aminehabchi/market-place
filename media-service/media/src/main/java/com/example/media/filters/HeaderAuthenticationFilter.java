@@ -30,7 +30,7 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String userId = request.getHeader("X-User-Id");
-        String roleHeader = "ROLE_" + request.getHeader("X-User-Role");
+        String roleHeader = request.getHeader("X-User-Role");
 
         System.out.println("----> " + request.getRequestURL().toString());
         System.out.println("userId ========> " + userId);

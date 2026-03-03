@@ -25,7 +25,7 @@ import com.example.media.stores.UserAvatarContentStore;
 import jakarta.annotation.security.PermitAll;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("api/media/users")
 public class UserController {
 
     private final AvatarService avatarService;
@@ -44,7 +44,7 @@ public class UserController {
     public ResponseEntity<UUID> uploadAvatar(
             @RequestBody byte[] fileBytes,
             @RequestHeader("Content-Type") String mimeType, Authentication authentication) throws Exception {
-
+                System.out.println("media users ===================================================================");
         String userId = (String) authentication.getPrincipal();
 
         UserAvatar avatar = avatarService.uploadAvatar(

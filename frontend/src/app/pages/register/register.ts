@@ -15,6 +15,7 @@ export class Register {
   isSubmitting = false;
   errorMessage = signal({ msg: '', isthere: false })
   selectedAvatar: File | null = null;
+  isAvatarSelected = signal(false);
   imageName: string = "";
   user = {
     email: '',
@@ -28,71 +29,68 @@ export class Register {
 
   onAvatarSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const file = input.files && input.files.length > 0 ? input.files[0] : null;
-    if (file && file?.size > 1024 * 1024 * 1024 * 2048) {
-      this.errorMessage.set({ msg: 'file size must not passe 2mb', isthere: true });
-      return;
-    } else if (file && file.type != 'image/png') {
-      this.errorMessage.set({ msg: 'file type must be image', isthere: true });
+    const file = input.files?.[0] ?? null;
+
+    if (file && file.size > 1024 * 1024 * 2) {
+      this.errorMessage.set({ msg: 'File size must not exceed 2MB.', isthere: true });
       return;
     }
+    if (file && !['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+      this.errorMessage.set({ msg: 'File must be a PNG, JPEG, or WebP image.', isthere: true });
+      return;
+    }
+
+    this.isAvatarSelected.set(!!file);
     this.selectedAvatar = file;
   }
 
   onSubmit(form: NgForm): void {
-    if (form.invalid || this.isSubmitting) {
-      return;
-    }
+    if (form.invalid || this.isSubmitting) return;
 
     if (this.user.password !== this.user.confirmPassword) {
       this.errorMessage.set({ msg: 'Passwords do not match.', isthere: true });
-      this.message = '';
       return;
     }
 
     this.isSubmitting = true;
-    this.message = '';
-    // this.loginService.registerUserWithAvatar(this.selectedAvatar).subscribe({
-    //   next: (res) => {
-    //     console.log(res);
-    //     this.imageName = res.msg;
-    //   },
-    //   error: (err) => {
-    //     console.error(err);
-    //   }
-    // })
-    this.loginService.registerUser({
-      email: this.user.email,
-      name: this.user.name,
-      password: this.user.password,
-      role: this.user.role,
-      avatarUrl: this.imageName
-    }).subscribe({
-      next: (res) => {
-        this.message = res.msg || 'Registration successful. You can login now.';
-        this.isSubmitting = false;
-        this.selectedAvatar = null;
-        form.resetForm({
-          email: '',
-          name: '',
-          password: '',
-          confirmPassword: '',
-          role: 'GUEST'
-        });
-        this.errorMessage.update((b) => {
-          b.isthere = false;
-          b.msg = '';
-          return b;
-        });
+    this.errorMessage.set({ msg: '', isthere: false });
 
-      },
-      error: (err) => {
-        this.errorMessage.set({
-          msg: err?.error?.message || err?.error?.msg || 'Registration failed. Please try again.',
-          isthere: true
-        });
-        this.isSubmitting = false;
-      }
-    });
+    const register = (avatarUrl: string = '') => {
+      this.loginService.registerUser({
+        email: this.user.email,
+        name: this.user.name,
+        password: this.user.password,
+        role: this.user.role,
+        avatarUrl
+      }).subscribe({
+        next: (res) => {
+          this.message = res.msg || 'Registration successful. You can login now.';
+          this.isSubmitting = false;
+          this.selectedAvatar = null;
+          this.isAvatarSelected.set(false);
+          form.resetForm({ email: '', name: '', password: '', confirmPassword: '', role: 'GUEST' });
+        },
+        error: (err) => {
+          this.errorMessage.set({
+            msg: err?.error?.message || err?.error?.msg || 'Registration failed. Please try again.',
+            isthere: true
+          });
+          this.isSubmitting = false;
+        }
+      });
+    };
+
+    if (this.isAvatarSelected() && this.selectedAvatar) {
+      this.loginService.uploadAvatar(this.selectedAvatar).subscribe({
+        next: (avatarUrl) => register(avatarUrl),
+        error: (err) => {
+          console.error(err);
+          this.errorMessage.set({ msg: 'Avatar upload failed. Please try again.', isthere: true });
+          this.isSubmitting = false;
+        }
+      });
+    } else {
+      register();
+    }
   }
 }

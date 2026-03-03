@@ -130,7 +130,7 @@ export class Profile implements OnInit, OnDestroy {
     this.successMessage.set('');
 
     const upload$ = this.selectedAvatar
-      ? this.userService.updateAvatar(this.selectedAvatar)
+      ? this.userService.uploadAvatar(this.selectedAvatar)
       : null;
 
     if (upload$)

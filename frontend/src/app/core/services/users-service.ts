@@ -70,6 +70,8 @@ export class UsersService {
     // });
 
     // formData.append('info', infoBlob);
+    console.log(userData.avatarUrl);
+    
 
     return this.http.post<ApiMessageResponse>(this.registerPath, userData);
   }
@@ -98,7 +100,7 @@ export class UsersService {
     return this.http.put<Me>(`/api/users/me`, userData);
   }
 
-  updateAvatar(avatar: File | null): Observable<string> {
+  uploadAvatar(avatar: File | null): Observable<string> {
     if (!avatar) {
       return throwError(() => new Error('No avatar file provided'));
     }

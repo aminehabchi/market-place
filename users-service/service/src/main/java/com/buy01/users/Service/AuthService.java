@@ -34,7 +34,7 @@ public class AuthService {
 
     public RegisterResDTOs register(RegisterReqDTOs req) {
         Role role = normalizeRole(req.role());
-
+        System.out.println("avatar uuid: " + req.avatarUrl());
         boolean exist = userRepository.existsByEmail(req.email());
 
         if (exist) {
