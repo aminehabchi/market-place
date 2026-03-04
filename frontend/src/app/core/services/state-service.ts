@@ -1,7 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject} from "rxjs";
-import { ApiResponse } from "../models/ApiResponse";
 import { Me } from "./users-service";
 
 @Injectable({
@@ -20,17 +19,26 @@ export class StateService {
         }
     }
 
-    getMyInfo() {
-        this.http.get<ApiResponse<Me>>("/api/users/me")
+    getMyInfo(): void {
+        this.http.get<Me>("/api/users/me")
             .subscribe({
-                next: (res: any) => {
-                    this.currentUserSubject.next(res);
+                next: (user) => {
+                    this.setUser(user);
                 },
                 error: (err) => console.error('Failed to load user', err)
             });
     }
+
+    setUser(user: Me | null): void {
+        this.currentUserSubject.next(user);
+        if (user) {
+            localStorage.setItem('user', JSON.stringify(user));
+        } else {
+            localStorage.removeItem('user');
+        }
+    }
+
     clearUser() {
-        this.currentUserSubject.next(null);
-        localStorage.removeItem('user');
+        this.setUser(null);
     }
 }

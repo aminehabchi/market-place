@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, Signal, signal } from '@angular/core';
 import { Me, UpdateProfile, UsersService } from '../../core/services/users-service';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -24,7 +24,7 @@ export class Profile implements OnInit, OnDestroy {
   editFormEmail = signal('');
   editFormAvatarUrl = signal('');
   profileAvatarSrc = signal('');
-  selectedAvatar: File | null = null;
+  selectedAvatar = signal<File | null>(null);
   avatarName: string = '';
   constructor(
     private userService: UsersService,
@@ -58,7 +58,7 @@ export class Profile implements OnInit, OnDestroy {
           URL.revokeObjectURL(this.profileAvatarSrc());
         }
         console.log("profile image");
-        
+
         const objectUrl = URL.createObjectURL(res);
         this.profileAvatarSrc.set(objectUrl);
       },
@@ -81,7 +81,7 @@ export class Profile implements OnInit, OnDestroy {
         this.editFormEmail.set(res.email);
         this.editFormAvatarUrl.set(res.avatarUrl || '');
         console.log(res);
-        
+
         this.loadProfileImg(res.avatarUrl);
         this.isLoading.set(false);
       },
@@ -117,7 +117,7 @@ export class Profile implements OnInit, OnDestroy {
       // this.errorMessage.set({ msg: 'file type must be image', isthere: true });
       return;
     }
-    this.selectedAvatar = file;
+    this.selectedAvatar.set(file);
   }
 
   onSubmit(form: NgForm): void {
@@ -129,8 +129,9 @@ export class Profile implements OnInit, OnDestroy {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    const upload$ = this.selectedAvatar
-      ? this.userService.uploadAvatar(this.selectedAvatar)
+    const avatarFile = this.selectedAvatar();
+    const upload$ = avatarFile
+      ? this.userService.uploadAvatar(avatarFile)
       : null;
 
     if (upload$)
@@ -143,6 +144,7 @@ export class Profile implements OnInit, OnDestroy {
               email: this.editFormEmail(),
               uuid: avatarIdOrUrl,
             };
+            this.loadProfileImg(avatarIdOrUrl);
             return this.userService.updateUser(updateData);
           })
         )

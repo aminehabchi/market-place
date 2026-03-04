@@ -14,6 +14,7 @@ import com.buy01.users.Entity.User;
 import com.buy01.users.Exceptions.UserExistException;
 import com.buy01.users.Repository.UserRepository;
 import com.buy01.users.Utils.JwtUtils;
+import com.example.shared.common.kafka.dtos.media.KafkaConfirmAvatarEvent;
 import com.example.shared.common.kafka.dtos.users.KafkaUserCreatedEvent;
 import com.example.shared.common.types.Role;
 
@@ -52,6 +53,10 @@ public class AuthService {
         UUID avatar = (user.avatarUrl() != null && !user.avatarUrl().isBlank())
                 ? UUID.fromString(user.avatarUrl())
                 : null;
+        if (avatar != null) {
+            KafkaConfirmAvatarEvent event = new KafkaConfirmAvatarEvent(avatar);
+            kafkaTemplate.send("confirm-avatar-events", null, event);
+        }
         KafkaUserCreatedEvent event = new KafkaUserCreatedEvent(user.id(), user.name(),
                 avatar);
 

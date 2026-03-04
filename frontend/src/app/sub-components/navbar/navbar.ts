@@ -2,9 +2,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, Inject, PLATFORM_ID, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { StateService } from '../../core/services/state-service';
-import { Role } from '../../core/models/Role';
-import { User } from '../../core/models/User';
-import { Me } from '../../core/services/users-service';
+import { Me, UsersService } from '../../core/services/users-service';
 
 @Component({
   selector: 'app-navbar',
@@ -15,7 +13,13 @@ import { Me } from '../../core/services/users-service';
 export class Navbar {
   isOpen = false;
   isSeller = signal(false);
+  currentUser = signal<Me | null>(null);
+  // crrAvatar = signal('');
+  profileAvatarSrc = signal('');
+
+
   constructor(
+    private userService: UsersService,
     private router: Router,
     private stateService: StateService,
     @Inject(PLATFORM_ID) private platformId: object
@@ -23,6 +27,7 @@ export class Navbar {
 
   ngOnInit() {
     this.stateService.currentUser$.subscribe((user: Me | null) => {
+      this.currentUser.set(user);
 
       if (user && user.role === "SELLER") {
         this.isSeller.set(true);
@@ -30,7 +35,47 @@ export class Navbar {
         this.isSeller.set(false);
       }
     });
+    if (!this.currentUser()?.id) {
+      return;
+    }
+    this.loadUser();
+  }
 
+  loadUser(): void {
+    this.stateService.getMyInfo();
+    // if (this.currentUser() && this.currentUser()?.avatarUrl)
+    console.log("image | === " + this.currentUser()?.avatarUrl);
+
+    this.loadProfileImg(this.currentUser()?.avatarUrl);
+    // this.crrAvatar.set(this.currentUser()?.avatarUrl);
+  }
+
+  loadProfileImg(avatarId: string | undefined): void {
+    if (!avatarId) {
+      // console.log("here");
+
+      this.profileAvatarSrc.set('');
+      return;
+    }
+
+    this.userService.getAvatar(avatarId).subscribe({
+      next: (res) => {
+        if (!isPlatformBrowser(this.platformId)) {
+          return;
+        }
+
+        if (this.profileAvatarSrc()) {
+          URL.revokeObjectURL(this.profileAvatarSrc());
+        }
+        console.log("profile image");
+
+        const objectUrl = URL.createObjectURL(res);
+        this.profileAvatarSrc.set(objectUrl);
+      },
+      error: (err) => {
+        console.error("err: ==============> ", err);
+      }
+    });
   }
 
   toggleMenu() {
@@ -44,6 +89,8 @@ export class Navbar {
 
     return false;
   }
+
+
 
   logout(): void {
     if (!isPlatformBrowser(this.platformId)) {

@@ -33,9 +33,11 @@
         }
 
         <!-- Profile Avatar -->
+        @if(isAuthenticated()) {
         <a routerLink="/profile" class="flex items-center">
-          <img src="avatar.jpeg" alt="Profile" class="h-8 w-8 rounded-full border-2 border-indigo-600">
+          <img [src]="profileAvatarSrc()" alt="Profile" class="h-8 w-8 rounded-full border-2 border-indigo-600">
         </a>
+        }
       </div>
 
       <!-- Mobile menu button -->

@@ -100,7 +100,7 @@ export class UsersService {
     return this.http.put<Me>(`/api/users/me`, userData);
   }
 
-  uploadAvatar(avatar: File | null): Observable<string> {
+  uploadAvatar(avatar: File): Observable<string> {
     if (!avatar) {
       return throwError(() => new Error('No avatar file provided'));
     }

@@ -13,6 +13,7 @@ import com.buy01.users.DTOs.RegisterResDTOs;
 import com.buy01.users.Entity.User;
 import com.buy01.users.Repository.UserRepository;
 import com.example.shared.common.kafka.dtos.users.KafkaUserUpdatedEvent;
+import com.example.shared.common.kafka.dtos.media.KafkaConfirmAvatarEvent;
 import com.example.shared.common.kafka.dtos.users.KafkaUserRemovedEvent;
 
 @Service
@@ -60,6 +61,10 @@ public class ProfileService {
 
         System.out.println("avatar ==================== " + req.uuid());
         User newUser = userRepository.save(updated);
+        if (updatedAvatarUrl != null) {
+            KafkaConfirmAvatarEvent event = new KafkaConfirmAvatarEvent(updatedAvatarUrl);
+            kafkaTemplate.send("confirm-avatar-events", null, event);
+        }
         KafkaUserUpdatedEvent event = new KafkaUserUpdatedEvent(newUser.id(), newUser.name(),
                 oldAvatarUrl,
                 updatedAvatarUrl);
