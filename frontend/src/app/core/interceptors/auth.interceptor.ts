@@ -13,24 +13,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 	const token = isBrowser ? localStorage.getItem('token') : null;
 
 	if (!token) {
-		return next(req).pipe(
-			catchError((error: unknown) => {
-				if (
-					isBrowser &&
-					error instanceof HttpErrorResponse &&
-					error.status === 401
-				) {
-					stateService.clearUser();
-					localStorage.removeItem('token');
-					localStorage.removeItem('role');
-					if (router.url !== '/login') {
-						void router.navigateByUrl('/login');
-					}
-				}
-
-				return throwError(() => error);
-			})
-		);
+		return next(req);
 	}
 
 	const authReq = req.clone({
