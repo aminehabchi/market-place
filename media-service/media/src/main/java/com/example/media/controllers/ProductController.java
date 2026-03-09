@@ -42,9 +42,15 @@ public class ProductController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<UUID> uploadImage(
+    public ResponseEntity<?> uploadImage(
             @RequestBody byte[] fileBytes,
             @RequestHeader("Content-Type") String mimeType, Authentication authentication) throws Exception {
+
+        if (!this.productImageService.isImageMimeType(mimeType)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("File must be an image");
+        }
 
         String userId = (String) authentication.getPrincipal();
 

@@ -23,6 +23,14 @@ public class AvatarService {
         this.contentStore = contentStore;
     }
 
+    public boolean isImageMimeType(String mimeType) {
+        if (mimeType == null) {
+            return false;
+        }
+
+        return mimeType.toLowerCase().startsWith("image/");
+    }
+
     @Transactional
     public UserAvatar uploadAvatar(InputStream inputStream, String mimeType, String userId) {
         // Create metadata

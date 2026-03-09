@@ -1,5 +1,4 @@
 package com.example.products.filters;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -10,8 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.example.products.repositories.UserRepository;
 import com.example.shared.common.types.Role;
-import com.mongodb.lang.NonNull;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,52 +21,59 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class HeaderAuthenticationFilter extends OncePerRequestFilter {
 
+    private final UserRepository userRepository;
+
+    public HeaderAuthenticationFilter(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     @Override
     protected void doFilterInternal(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain)
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
 
         String userId = request.getHeader("X-User-Id");
         String roleHeader = "ROLE_" + request.getHeader("X-User-Role");
 
-        System.out.println("----> " + request.getRequestURL().toString());
-        System.out.println("userId ========> " + userId);
-        System.out.println("role ========> " + roleHeader);
+        System.out.println("===> " + userId);
+        System.out.println("===> " + roleHeader);
 
         if (roleHeader == null || roleHeader.isBlank()) {
-            // No role header, just continue
             filterChain.doFilter(request, response);
             return;
         }
-        System.out.println(" ---- ================ " + roleHeader);
-        Role role = Role.fromString(roleHeader);
-        System.out.println(" ++++ ================ " + role);
 
-        // Only parse UUID for roles that need it
-        if (role.isBuyer() || role.isSeller() || role.isAdmin()) {
-            if (userId == null || userId.isBlank()) {
+        Role role = Role.fromString(roleHeader);
+
+        if (!role.isGuest()) {
+            if (userId == null || userId.isBlank() || !userRepository.existsById(userId)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+            if (!isUserExist(userId)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
         }
 
-        if (role.isGuest()) {
-            userId = "";
-        }
-
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
+
             var authorities = List.of(new SimpleGrantedAuthority(roleHeader));
 
             var authentication = new UsernamePasswordAuthenticationToken(
-                    userId, // null for guest
+                    userId,
                     null,
                     authorities);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-        System.out.println("Authorities: " + SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isUserExist(String userId) {
+        return this.userRepository.existsById(userId);
     }
 }

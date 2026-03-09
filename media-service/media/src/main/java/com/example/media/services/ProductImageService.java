@@ -24,6 +24,14 @@ public class ProductImageService {
         this.contentStore = contentStore;
     }
 
+    public boolean isImageMimeType(String mimeType) {
+        if (mimeType == null) {
+            return false;
+        }
+
+        return mimeType.toLowerCase().startsWith("image/");
+    }
+
     @Transactional
     public ProductImage uploadAvatar(InputStream inputStream, String mimeType, String userId) {
         ProductImage image = new ProductImage();

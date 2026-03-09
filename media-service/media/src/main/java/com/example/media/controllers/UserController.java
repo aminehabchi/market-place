@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.media.models.UserAvatar;
-import com.example.media.repositories.AvatarRepository;
 import com.example.media.services.AvatarService;
 import com.example.media.stores.UserAvatarContentStore;
 
@@ -29,22 +28,25 @@ import jakarta.annotation.security.PermitAll;
 public class UserController {
 
     private final AvatarService avatarService;
-    private final AvatarRepository repository;
+
     private final UserAvatarContentStore contentStore;
 
-    public UserController(AvatarService avatarService,
-            AvatarRepository repository,
-            UserAvatarContentStore contentStore) {
+    public UserController(AvatarService avatarService, UserAvatarContentStore contentStore) {
         this.avatarService = avatarService;
-        this.repository = repository;
         this.contentStore = contentStore;
     }
 
     @PostMapping("/")
-    public ResponseEntity<UUID> uploadAvatar(
+    public ResponseEntity<?> uploadAvatar(
             @RequestBody byte[] fileBytes,
             @RequestHeader("Content-Type") String mimeType, Authentication authentication) throws Exception {
-                System.out.println("media users ===================================================================");
+
+        if (!this.avatarService.isImageMimeType(mimeType)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("File must be an image");
+        }
+
         String userId = (String) authentication.getPrincipal();
 
         UserAvatar avatar = avatarService.uploadAvatar(
