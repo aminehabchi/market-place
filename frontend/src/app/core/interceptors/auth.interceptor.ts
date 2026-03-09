@@ -33,7 +33,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 				localStorage.removeItem('token');
 				localStorage.removeItem('role');
 				if (router.url !== '/login') {
-					void router.navigateByUrl('/login');
+					router.navigateByUrl('/login');
 				}
 			}
 
