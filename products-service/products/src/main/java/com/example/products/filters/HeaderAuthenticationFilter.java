@@ -1,4 +1,5 @@
 package com.example.products.filters;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -46,13 +47,14 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
         }
 
         Role role = Role.fromString(roleHeader);
-
+        System.out.println("====> " + role);
         if (!role.isGuest()) {
             if (userId == null || userId.isBlank() || !userRepository.existsById(userId)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
             if (!isUserExist(userId)) {
+                System.out.println("=============>  User Not Exist");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
@@ -74,6 +76,9 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean isUserExist(String userId) {
+        if (userId == null || userId.isEmpty() || userId.isBlank()) {
+            return false;
+        }
         return this.userRepository.existsById(userId);
     }
 }

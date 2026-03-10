@@ -1,5 +1,9 @@
 #!/bin/bash
 
+cd ../shared
+mvn compile install 
+cd ../script
+
 docker network create shared-net
 
 docker compose -f ../eureka-server/docker-compose.yaml up -d

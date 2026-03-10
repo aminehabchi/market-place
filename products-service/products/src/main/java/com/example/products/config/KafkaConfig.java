@@ -14,6 +14,8 @@ import org.springframework.kafka.core.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.kafka.support.serializer.JsonDeserializer;
+
 @EnableKafka
 @Configuration
 public class KafkaConfig {
@@ -30,11 +32,15 @@ public class KafkaConfig {
     @Bean
     public Map<String, Object> consumerConfigs() {
         Map<String, Object> props = new HashMap<>();
+
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, consumerGroupId);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+
         return props;
     }
 
