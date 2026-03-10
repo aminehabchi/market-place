@@ -5,12 +5,14 @@ services:
     ports:
       - "10000:10000"
     environment:
-      DISCOVERY : http://eureka-server:8761/eureka
+      DISCOVERY : https://eureka-server:8761/eureka
       REDIS-HOST : redis
       REDIS-PORT : 6379
     volumes:
       - backend_m2:/root/.m2
       - ~/.m2:/root/.m2
+      - ./certs/gateway.p12:/app/resources/certs/gateway.p12:ro
+      - ./certs/truststore.p12:/app/resources/certs/truststore.p12:ro
     networks:
       - shared-net
 
