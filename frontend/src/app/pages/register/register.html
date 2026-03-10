@@ -38,11 +38,6 @@
                 </select>
             </div>
 
-            <div class="field-group">
-                <label for="avatar">Avatar (optional)</label>
-                <input id="avatar" name="avatar" type="file" accept="image/*" (change)="onAvatarSelected($event)" />
-            </div>
-
             <button type="submit" [disabled]="isSubmitting || registerForm.invalid">
                 {{ isSubmitting ? 'Creating account...' : 'Register' }}
             </button>

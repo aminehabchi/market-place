@@ -22,7 +22,7 @@ public class UserAvatar {
     private UUID id;
 
     @Field("user_id")
-    private String UserId;
+    private String userId;
 
     @Field("created_at")
     private LocalDateTime createdAt = LocalDateTime.now();

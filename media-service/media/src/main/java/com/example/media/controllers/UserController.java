@@ -24,7 +24,7 @@ import com.example.media.stores.UserAvatarContentStore;
 import jakarta.annotation.security.PermitAll;
 
 @RestController
-@RequestMapping("api/media/users")
+@RequestMapping("/users")
 public class UserController {
 
     private final AvatarService avatarService;
