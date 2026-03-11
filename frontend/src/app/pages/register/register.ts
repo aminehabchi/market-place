@@ -69,7 +69,7 @@ export class Register {
           this.selectedAvatar = null;
           this.isAvatarSelected.set(false);
           form.resetForm({ email: '', name: '', password: '', confirmPassword: '', role: 'GUEST' });
-          this.router.navigate(['/']);
+          this.router.navigate(['/login']);
         },
         error: (err) => {
           this.errorMessage.set({
