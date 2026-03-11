@@ -15,8 +15,8 @@ services:
       context: ./service
     restart: on-failure
     container_name: users-service
-    ports:
-      - "8080:8080"
+    # ports:
+      # - "8080:8080"
     environment:
       - JWT_SECRET=4cfeee175e498e32039c7e804957663cb8e09b58a0902bf56222acab991cb4bd955bdf3c25942131e432c59be57d411c31f25c6432bd18fd8f006b8913636da2
       - JWT_EXP=3600000
@@ -26,7 +26,7 @@ services:
       - MONGODB_PORT=27017
       - MONGO_DB=users_db
       - MONGODB_AUTH=admin
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
       - DISCOVERY=http://eureka-server:8761/eureka
 
     networks:
@@ -37,6 +37,8 @@ services:
       - ./service/src:/app/src
       - ~/.gradle:/root/.gradle
       - ~/.m2:/root/.m2
+      - ./certs/users-service.p12:/app/resources/certs/users-service.p12:ro
+      - ./certs/truststore.p12:/app/resources/certs/truststore.p12:ro
     working_dir: /app
 volumes:
   mongo_data:

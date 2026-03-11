@@ -20,12 +20,16 @@ services:
       - "8000:8000"
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://amine:1234@products-service-mongodb:27017/DB?authSource=admin
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       DISCOVERY : http://eureka-server:8761/eureka
+      JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/app/resources/certs/truststore.p12 -Djavax.net.ssl.trustStorePassword=123123 -Djavax.net.ssl.trustStoreType=PKCS12 -Djavax.net.ssl.keyStore=/app/resources/certs/users-service.p12 -Djavax.net.ssl.keyStorePassword=123123 -Djavax.net.ssl.keyStoreType=PKCS12
+
     depends_on:
       - products-service-mongodb
     volumes:
       - backend_m2:/root/.m2
+      - ./certs/products-service.p12:/app/resources/certs/products-service.p12:ro
+      - ./certs/truststore.p12:/app/resources/certs/truststore.p12:ro
     networks:
       - shared-net
 
