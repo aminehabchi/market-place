@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { UsersService } from '../../core/services/users-service';
 
 @Component({
@@ -25,7 +25,7 @@ export class Register {
     role: 'GUEST'
   };
 
-  constructor(private loginService: UsersService) { }
+  constructor(private loginService: UsersService, private router: Router) { }
 
   onAvatarSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -69,6 +69,7 @@ export class Register {
           this.selectedAvatar = null;
           this.isAvatarSelected.set(false);
           form.resetForm({ email: '', name: '', password: '', confirmPassword: '', role: 'GUEST' });
+          this.router.navigate(['/login']);
         },
         error: (err) => {
           this.errorMessage.set({

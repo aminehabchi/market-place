@@ -27,6 +27,9 @@ export class Navbar {
 
   ngOnInit() {
     this.stateService.currentUser$.subscribe((user: Me | null) => {
+      if (user == null) {
+        return
+      }
       this.currentUser.set(user);
 
       if (user && user.role === "SELLER") {

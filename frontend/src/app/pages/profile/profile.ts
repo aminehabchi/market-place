@@ -130,38 +130,42 @@ export class Profile implements OnInit, OnDestroy {
     this.successMessage.set('');
 
     const avatarFile = this.selectedAvatar();
-    const upload$ = avatarFile
-      ? this.userService.uploadAvatar(avatarFile)
-      : null;
 
-    if (upload$)
-      upload$
-        .pipe(
-          switchMap((avatarIdOrUrl) => {
-            this.avatarName = avatarIdOrUrl;
-            const updateData: UpdateProfile = {
-              name: this.editFormName(),
-              email: this.editFormEmail(),
-              uuid: avatarIdOrUrl,
-            };
-            this.loadProfileImg(avatarIdOrUrl);
-            return this.userService.updateUser(updateData);
-          })
-        )
-        .subscribe({
-          next: (res) => {
-            this.userProfile.set(res);
-            this.successMessage.set('Profile updated successfully!');
-            this.isSubmitting.set(false);
-            this.isEditing.set(false);
-          },
-          error: (err) => {
-            this.errorMessage.set(err?.error?.message || err?.error?.msg || 'Failed to update profile. Please try again.');
-            this.isSubmitting.set(false);
-          }
-        });
+    // Create the observable for update
+    const update$ = avatarFile
+      ? this.userService.uploadAvatar(avatarFile).pipe(
+        switchMap((avatarIdOrUrl) => {
+          this.avatarName = avatarIdOrUrl;
+          const updateData: UpdateProfile = {
+            name: this.editFormName(),
+            email: this.editFormEmail(),
+            uuid: avatarIdOrUrl, // avatar ID or URL returned from upload
+          };
+          this.loadProfileImg(avatarIdOrUrl); // update preview
+          return this.userService.updateUser(updateData);
+        })
+      )
+      : this.userService.updateUser({
+        name: this.editFormName(),
+        email: this.editFormEmail(),
+        uuid: this.avatarName || this.editFormAvatarUrl(), // keep existing avatar if no new upload
+      });
+
+    update$.subscribe({
+      next: (res) => {
+        this.userProfile.set(res);
+        this.successMessage.set('Profile updated successfully!');
+        this.isSubmitting.set(false);
+        this.isEditing.set(false);
+      },
+      error: (err) => {
+        this.errorMessage.set(
+          err?.error?.message || err?.error?.msg || 'Failed to update profile. Please try again.'
+        );
+        this.isSubmitting.set(false);
+      },
+    });
   }
-
   onDeleteUser() {
     if (this.isSubmitting()) {
       return;

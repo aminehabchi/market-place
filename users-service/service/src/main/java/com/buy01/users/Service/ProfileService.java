@@ -12,9 +12,9 @@ import com.buy01.users.DTOs.ProfileUpdateReqDTOs;
 import com.buy01.users.DTOs.RegisterResDTOs;
 import com.buy01.users.Entity.User;
 import com.buy01.users.Repository.UserRepository;
-import com.example.shared.common.kafka.dtos.users.KafkaUserUpdatedEvent;
 import com.example.shared.common.kafka.dtos.media.KafkaConfirmAvatarEvent;
 import com.example.shared.common.kafka.dtos.users.KafkaUserRemovedEvent;
+import com.example.shared.common.kafka.dtos.users.KafkaUserUpdatedEvent;
 
 @Service
 public class ProfileService {
@@ -45,9 +45,6 @@ public class ProfileService {
                 : null;
 
         if (req.uuid() != null) {
-            if (!"SELLER".equalsIgnoreCase(user.role())) {
-                throw new IllegalArgumentException("Only SELLER can update avatar");
-            }
             updatedAvatarUrl = req.uuid();
         }
 
