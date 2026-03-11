@@ -4,8 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.UUID;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -78,22 +78,27 @@ public class UserController {
 
     @GetMapping("/{id}")
     @PermitAll
-    public ResponseEntity<byte[]> getAvatar(@PathVariable UUID id)
-            throws Exception {
+    public ResponseEntity<?> getAvatar(@PathVariable UUID id) {
 
-        UserAvatar avatar = this.avatarService.getAvatarbyId(id);
-        if (avatar == null) {
-            return ResponseEntity.notFound().build();
-        }
+        try {
+            UserAvatar avatar = this.avatarService.getAvatarbyId(id);
+            if (avatar == null) {
+                return ResponseEntity.notFound().build();
+            }
 
-        try (InputStream is = contentStore.getContent(avatar)) {
+            try (InputStream is = contentStore.getContent(avatar)) {
+                byte[] bytes = is.readAllBytes();
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(avatar.getMimeType()))
+                        .contentLength(avatar.getContentLength())
+                        .body(bytes);
+            }
 
-            byte[] bytes = is.readAllBytes();
-
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_TYPE, avatar.getMimeType())
-                    .contentLength(avatar.getContentLength())
-                    .body(bytes);
+        } catch (Exception e) {
+            // Return JSON error, even if endpoint usually returns image
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("Error reading avatar");
         }
     }
 }

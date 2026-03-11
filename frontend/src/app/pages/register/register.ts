@@ -22,7 +22,7 @@ export class Register {
     name: '',
     password: '',
     confirmPassword: '',
-    role: 'GUEST'
+    role: 'BUYER'
   };
 
   constructor(private loginService: UsersService, private router: Router) { }
@@ -68,7 +68,7 @@ export class Register {
           this.isSubmitting = false;
           this.selectedAvatar = null;
           this.isAvatarSelected.set(false);
-          form.resetForm({ email: '', name: '', password: '', confirmPassword: '', role: 'GUEST' });
+          form.resetForm({ email: '', name: '', password: '', confirmPassword: '', role: 'BUYER' });
           this.router.navigate(['/login']);
         },
         error: (err) => {

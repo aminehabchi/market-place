@@ -67,8 +67,10 @@
     <button (click)="logout()"
       class="block w-full text-left text-red-600 hover:text-red-700 px-3 py-2 rounded-md text-sm font-medium">Logout</button>
     }
+    @if (isSeller()) {
     <a routerLink="/dashboard"
       class="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+    }
     <a routerLink="/profile"
       class="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Profile</a>
   </div>

@@ -44,10 +44,10 @@ public class ProfileService {
                 ? UUID.fromString(user.avatarUrl())
                 : null;
 
+        System.err.println("===//§§>>  " + req.uuid());
         if (req.uuid() != null) {
             updatedAvatarUrl = req.uuid();
         }
-
         User updated = new User(
                 user.id(),
                 updatedName,

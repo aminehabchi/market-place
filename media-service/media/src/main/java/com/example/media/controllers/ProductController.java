@@ -5,8 +5,8 @@ import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -85,7 +85,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     @PermitAll
-    public ResponseEntity<byte[]> getImage(@PathVariable UUID id) throws Exception {
+    public ResponseEntity<?> getImage(@PathVariable UUID id) {
 
         Optional<ProductImage> optionalImage = repository.findById(id);
 
@@ -100,9 +100,15 @@ public class ProductController {
             byte[] bytes = is.readAllBytes();
 
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_TYPE, image.getMimeType())
+                    .contentType(MediaType.parseMediaType(image.getMimeType()))
                     .contentLength(image.getContentLength())
                     .body(bytes);
+
+        } catch (Exception e) {
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("Error reading image");
         }
     }
 

@@ -110,7 +110,7 @@ export class Profile implements OnInit, OnDestroy {
   onAvatarSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files && input.files.length > 0 ? input.files[0] : null;
-    if (file && file?.size > 1024 * 1024 * 1024 * 2048) {
+    if (file && file?.size > 1024 * 1024 * 2048) {
       // this.errorMessage.set({ msg: 'file size must not passe 2mb', isthere: true });
       return;
     } else if (file && file.type != 'image/png') {
@@ -159,6 +159,8 @@ export class Profile implements OnInit, OnDestroy {
         this.isEditing.set(false);
       },
       error: (err) => {
+        console.log("===> "+err.message);
+        
         this.errorMessage.set(
           err?.error?.message || err?.error?.msg || 'Failed to update profile. Please try again.'
         );

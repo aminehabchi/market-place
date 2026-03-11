@@ -1,11 +1,12 @@
 package com.buy01.users.Service;
 
+import java.util.UUID;
+
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import java.util.UUID;
+
 import com.buy01.users.DTOs.LoginReqDTOs;
 import com.buy01.users.DTOs.LoginResDTOs;
 import com.buy01.users.DTOs.RegisterReqDTOs;
@@ -36,6 +37,7 @@ public class AuthService {
     public RegisterResDTOs register(RegisterReqDTOs req) {
         Role role = normalizeRole(req.role());
         System.out.println("avatar uuid: " + req.avatarUrl());
+        System.out.println("role: " + req.role());
         boolean exist = userRepository.existsByEmail(req.email());
 
         if (exist) {
@@ -83,10 +85,8 @@ public class AuthService {
         String normalized = roleInput.trim().toUpperCase();
 
         return switch (normalized) {
-            case "CLIENT", "BUYER" -> Role.ROLE_BUYER;
+            case "BUYER" -> Role.ROLE_BUYER;
             case "SELLER" -> Role.ROLE_SELLER;
-            case "ADMIN" -> Role.ROLE_ADMIN;
-            case "GUEST" -> Role.ROLE_GUEST;
             default -> throw new IllegalArgumentException(
                     "Invalid role. Use CLIENT or SELLER");
         };
