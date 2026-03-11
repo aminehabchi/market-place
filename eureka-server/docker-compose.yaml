@@ -7,9 +7,9 @@ services:
       - "8761:8761"
     networks:
       - shared-net
-    volumes:
-      - ./certs/eureka-service.p12:/app/resources/certs/eureka-service.p12:ro
-      - ./certs/truststore.p12:/app/resources/certs/truststore.p12:ro
+    # volumes:
+      # - ./certs/eureka-service.p12:/app/resources/certs/eureka-service.p12:ro
+      # - ./certs/truststore.p12:/app/resources/certs/truststore.p12:ro
 
 networks:
   shared-net:

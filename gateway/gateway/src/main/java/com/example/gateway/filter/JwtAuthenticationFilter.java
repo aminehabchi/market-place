@@ -32,9 +32,9 @@ public class JwtAuthenticationFilter implements GlobalFilter {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
 
-        // if (isPublicEndpoint(request.getPath().value())) {
-        // return chain.filter(exchange);
-        // }
+        if (isPublicEndpoint(request.getPath().value())) {
+            return chain.filter(exchange);
+        }
 
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -69,7 +69,7 @@ public class JwtAuthenticationFilter implements GlobalFilter {
             } catch (SignatureException e) {
                 return sendUnauthorizedError(exchange.getResponse(), "Invalid token signature");
             } catch (Exception e) {
-                return sendUnauthorizedError(exchange.getResponse(), "Invalid or expired token");
+                return sendUnauthorizedError(exchange.getResponse(), "Invalid or expired token: " + e.getMessage());
             }
         }
 

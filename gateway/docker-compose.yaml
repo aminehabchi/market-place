@@ -5,7 +5,7 @@ services:
     ports:
       - "10000:10000"
     environment:
-      DISCOVERY : https://eureka-server:8761/eureka
+      DISCOVERY : http://eureka-server:8761/eureka
       REDIS-HOST : redis
       REDIS-PORT : 6379
       JAVA_TOOL_OPTIONS : -Djavax.net.ssl.trustStore=/app/resources/certs/truststore.p12 -Djavax.net.ssl.trustStorePassword=123123 -Djavax.net.ssl.keyStore=/app/resources/certs/gateway.p12 -Djavax.net.ssl.keyStorePassword=123123
