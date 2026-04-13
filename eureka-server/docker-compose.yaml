@@ -2,6 +2,7 @@ services:
   eureka-server:
     build:
       context: ./eureka
+      dockerfile: Dockerfile
     container_name: eureka-server
     ports:
       - "8761:8761"

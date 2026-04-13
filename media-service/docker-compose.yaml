@@ -1,6 +1,8 @@
 services:
   media-service-mongodb:
-    build: ./database
+    build:
+      context: ./database
+      dockerfile: dockerfile
     container_name: media-service-mongodb
     environment:
       MONGO_INITDB_ROOT_USERNAME: amine

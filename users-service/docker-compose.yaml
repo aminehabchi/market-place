@@ -13,6 +13,7 @@ services:
   users-service:
     build: 
       context: ./service
+      dockerfile: dockerfile
     restart: on-failure
     container_name: users-service
     # ports:
