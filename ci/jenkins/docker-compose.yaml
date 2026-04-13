@@ -1,0 +1,18 @@
+services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: buy01-jenkins
+    restart: unless-stopped
+    user: root
+    ports:
+      - "8089:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../../:/var/jenkins_home/workspace/buy-01
+
+volumes:
+  jenkins_home:
