@@ -1,8 +1,14 @@
-FROM gradle:9.3.1-jdk25-noble
+FROM gradle:9.3.1-jdk21
 WORKDIR /app
 
 COPY build.gradle settings.gradle ./
-RUN gradle dependencies
+RUN set -eux; \
+	for i in 1 2 3; do \
+		gradle --no-daemon dependencies && break; \
+		if [ "$i" -eq 3 ]; then exit 1; fi; \
+		echo "[users-service] Gradle dependency resolution failed, retrying..."; \
+		sleep 10; \
+	done
 
 COPY src ./src
 
