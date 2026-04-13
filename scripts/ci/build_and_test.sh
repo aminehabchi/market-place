@@ -36,17 +36,18 @@ ensure_java_21() {
 
 run_maven_module() {
   local module_dir="$1"
-  echo "[CI] Testing Maven module: ${module_dir}"
+  local maven_goal="${2:-verify}"
+  echo "[CI] Running Maven (${maven_goal}) for module: ${module_dir}"
 
   if [[ -x "${module_dir}/mvnw" ]]; then
     (
       cd "${module_dir}"
-      ./mvnw -B clean verify
+      ./mvnw -B clean "${maven_goal}"
     )
   else
     (
       cd "${module_dir}"
-      mvn -B clean verify
+      mvn -B clean "${maven_goal}"
     )
   fi
 }
@@ -89,8 +90,8 @@ run_frontend_tests() {
 
 ensure_java_21
 
-# Build and verify shared library first because multiple services depend on it.
-run_maven_module "shared"
+# Install shared library first because multiple services depend on it.
+run_maven_module "shared" "install"
 
 run_maven_module "eureka-server/eureka"
 run_maven_module "gateway/gateway"
