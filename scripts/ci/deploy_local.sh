@@ -7,7 +7,7 @@ cd "${ROOT_DIR}"
 compose_up() {
   local compose_file="$1"
   echo "[CD] Applying ${compose_file}"
-  docker compose -f "${compose_file}" up -d --build
+  docker-compose -f "${compose_file}" up -d --build
 }
 
 if ! docker network inspect shared-net >/dev/null 2>&1; then
