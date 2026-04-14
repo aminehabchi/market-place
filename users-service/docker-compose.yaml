@@ -35,11 +35,11 @@ services:
     depends_on:
         - user-mongodb
     volumes:
-      - ./service/src:/app/src
+      - /home/abdelilah/buy-01/users-service/service/src:/app/src
       - ~/.gradle:/root/.gradle
       - /home/abdelilah/.m2:/root/.m2
-      - ./certs/users-service.p12:/app/resources/certs/users-service.p12:ro
-      - ./certs/truststore.p12:/app/resources/certs/truststore.p12:ro
+      - /home/abdelilah/buy-01/users-service/certs/users-service.p12:/app/resources/certs/users-service.p12:ro
+      - /home/abdelilah/buy-01/users-service/certs/truststore.p12:/app/resources/certs/truststore.p12:ro
     working_dir: /app
 volumes:
   mongo_data:
