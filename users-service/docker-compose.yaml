@@ -37,7 +37,7 @@ services:
     volumes:
       - ./service/src:/app/src
       - ~/.gradle:/root/.gradle
-      - ~/.m2:/root/.m2
+      - /home/abdelilah/.m2:/root/.m2
       - ./certs/users-service.p12:/app/resources/certs/users-service.p12:ro
       - ./certs/truststore.p12:/app/resources/certs/truststore.p12:ro
     working_dir: /app
