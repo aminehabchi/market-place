@@ -79,6 +79,10 @@ run_frontend_tests() {
   (
     cd "${module_dir}"
     npm ci
+    if [[ ! -f "node_modules/lightningcss-linux-x64-gnu/lightningcss.linux-x64-gnu.node" ]]; then
+      echo "[CI] Reinstalling missing lightningcss Linux native binary."
+      npm install --no-save --include=optional lightningcss-linux-x64-gnu@1.30.2
+    fi
     if find src -type f \( -name "*.spec.ts" -o -name "*.test.ts" \) | grep -q .; then
       npm run test -- --watch=false
     else
