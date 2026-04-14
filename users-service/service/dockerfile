@@ -13,4 +13,4 @@ COPY build.gradle settings.gradle ./
 COPY src ./src
 
 EXPOSE 8080
-CMD ["bash", "-c", "gradle bootRun & gradle classes --continuous"]
+CMD ["gradle", "--no-daemon", "bootRun"]
