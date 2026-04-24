@@ -31,7 +31,7 @@ public class AuthApiTest extends BaseSpec {
                   "email": "%s",
                   "name": "Test User",
                   "password": "%s",
-                  "role": "CLIENT"
+                  "role": "SELLER"
                 }
                 """.formatted(TEST_EMAIL, TEST_PASSWORD))
         .when()
@@ -54,7 +54,7 @@ public class AuthApiTest extends BaseSpec {
                   "email": "%s",
                   "name": "Test User",
                   "password": "%s",
-                  "role": "CLIENT"
+                  "role": "SELLER"
                 }
                 """.formatted(TEST_EMAIL, TEST_PASSWORD))
         .when()
@@ -73,7 +73,7 @@ public class AuthApiTest extends BaseSpec {
                 {
                   "name": "Test User",
                   "password": "password123",
-                  "role": "CLIENT"
+                  "role": "SELLER"
                 }
                 """)
         .when()
@@ -93,7 +93,7 @@ public class AuthApiTest extends BaseSpec {
                   "email": "not-an-email",
                   "name": "Test User",
                   "password": "password123",
-                  "role": "CLIENT"
+                  "role": "SELLER"
                 }
                 """)
         .when()
@@ -113,7 +113,7 @@ public class AuthApiTest extends BaseSpec {
                   "email": "short@test.com",
                   "name": "Test User",
                   "password": "123",
-                  "role": "CLIENT"
+                  "role": "SELLER"
                 }
                 """)
         .when()
@@ -153,7 +153,7 @@ public class AuthApiTest extends BaseSpec {
                   "email": "name@test.com",
                   "name": "A",
                   "password": "password123",
-                  "role": "CLIENT"
+                  "role": "SELLER"
                 }
                 """)
         .when()
