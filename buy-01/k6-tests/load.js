@@ -5,9 +5,9 @@ http.setResponseCallback(http.expectedStatuses(200, { min: 400, max: 499 }));
 
 export const options = {
   stages: [
-    { duration: '30s', target: 50 },  // ramp up to 20 users
-    { duration: '1m',  target: 100 },  // stay at 20 users
-    { duration: '1m', target: 200  },  // ramp down
+    { duration: '30s', target: 50 },
+    { duration: '1m',  target: 100 },
+    { duration: '1m', target: 200  },
   ],
   insecureSkipTLSVerify: true,
   thresholds: {
