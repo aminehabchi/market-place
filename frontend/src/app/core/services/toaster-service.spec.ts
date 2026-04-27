@@ -22,7 +22,5 @@ describe('ToasterService', () => {
     expect(toast).not.toBeNull();
     expect(toast?.type).toBe('error');
     expect(toast?.message).toBe('Something went wrong');
-    console.log("test jenkies front ===================================================");
-    
   });
 });

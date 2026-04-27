@@ -77,6 +77,22 @@ export default function (data) {
     'login success returns token': () => !!successJson && !!successJson.token,
   });
 
+  const token = successJson && successJson.token ? successJson.token : null;
+
+  const productsRes = http.get(
+    `${BASE_URL}/api/products/`,
+    {
+      headers: {
+        Authorization: `Bearer ${token || ''}`,
+      },
+    }
+  );
+
+  check(productsRes, {
+    'products responds under 2s': (r) => r.timings.duration < 2000,
+    'products returns 200': (r) => r.status === 200,
+  });
+
   const loginFailRes = http.post(
     `${BASE_URL}/api/users/login`,
     JSON.stringify({
