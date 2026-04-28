@@ -18,8 +18,8 @@ public class UserService {
 
     public void createUser(KafkaUserCreatedEvent object) {
         User u = new User(object.userId());
-        u = this.userRepository.save(u);
-        System.err.println("new user added ==> " + u.getId());
+        User savedUser = this.userRepository.save(u);
+        System.err.println("new user added ==> " + (savedUser != null ? savedUser.getId() : u.getId()));
     }
 
     public void deleteUser(KafkaUserRemovedEvent object) {

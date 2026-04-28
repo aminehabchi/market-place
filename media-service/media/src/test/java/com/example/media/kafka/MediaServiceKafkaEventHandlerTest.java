@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.TestPropertySource;
 
@@ -33,6 +34,16 @@ import com.example.shared.common.kafka.dtos.media.KafkaConfirmAvatarEvent;
 import com.example.shared.common.kafka.dtos.media.KafkaConfirmImageEvent;
 
 @SpringBootTest
+@EmbeddedKafka(partitions = 1, topics = {
+    "create-user-events",
+    "remove-user-events",
+    "create-product-events",
+    "remove-product-events",
+    "confirm-avatar-events",
+    "delete-avatar-events",
+    "confirm-image-events",
+    "delete-image-events"
+})
 @TestPropertySource(properties = {
     "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}",
     "logging.level.org.apache.kafka=WARN"
