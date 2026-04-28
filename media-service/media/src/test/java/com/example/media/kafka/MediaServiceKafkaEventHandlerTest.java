@@ -15,7 +15,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.TestPropertySource;
 
@@ -42,16 +42,16 @@ class MediaServiceKafkaEventHandlerTest {
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
 
-    @MockBean
+    @MockitoBean
     private UserService userService;
 
-    @MockBean
+    @MockitoBean
     private AvatarService avatarService;
 
-    @MockBean
+    @MockitoBean
     private ProductService productService;
 
-    @MockBean
+    @MockitoBean
     private ProductImageService productImageService;
 
     private UserEvents userEvents;
@@ -62,21 +62,21 @@ class MediaServiceKafkaEventHandlerTest {
 
     private ProductImagesEvents productImagesEvents;
 
-    private UUID userId;
+    private String userId;
     private UUID productId;
     private UUID imageId;
     private UUID avatarId;
 
     @BeforeEach
     void setUp() {
-        userId = UUID.randomUUID();
+        userId = UUID.randomUUID().toString();
         productId = UUID.randomUUID();
         imageId = UUID.randomUUID();
         avatarId = UUID.randomUUID();
 
         doNothing().when(userService).createUser(any(KafkaUserCreatedEvent.class));
         doNothing().when(userService).deleteUser(any(KafkaUserRemovedEvent.class));
-        doNothing().when(avatarService).deleteAvatarByUserId(any(UUID.class));
+        doNothing().when(avatarService).deleteAvatarByUserId(UUID.class.toString());
         doNothing().when(productService).createProduct(any(KafkaProductCreatedEvent.class));
         doNothing().when(productService).deleteProduct(any(KafkaProductRemovedEvent.class));
         doNothing().when(productImageService).deleteProductImageByProductId(any(UUID.class));
@@ -98,7 +98,7 @@ class MediaServiceKafkaEventHandlerTest {
 
         KafkaUserCreatedEvent capturedEvent = captor.getValue();
         assert capturedEvent.userId().equals(userId);
-        assert "Test User".equals(capturedEvent.name());
+        assert "Test User".equals(capturedEvent.username());
     }
 
     @Test
@@ -129,7 +129,7 @@ class MediaServiceKafkaEventHandlerTest {
         verify(productService).createProduct(captor.capture());
 
         KafkaProductCreatedEvent capturedEvent = captor.getValue();
-        assert capturedEvent.productId().equals(productId);
+        assert capturedEvent.id().equals(productId);
     }
 
     @Test

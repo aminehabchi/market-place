@@ -36,12 +36,16 @@ class ProductServiceTest {
     @Mock
     private KafkaTemplate<String, Object> kafkaTemplate;
 
+    @Mock
+    private ProductEvents productEvents;
+    @Mock
+    private MediaEvents mediaEvents;
     private ProductService productService;
 
     @BeforeEach
     void setUp() {
-        ProductEvents productEvents = new ProductEvents(kafkaTemplate);
-        MediaEvents mediaEvents = new MediaEvents(kafkaTemplate);
+        // productEvents = new ProductEvents(kafkaTemplate);
+        // mediaEvents = new MediaEvents(kafkaTemplate);
         productService = new ProductService(productRepository, productEvents, mediaEvents);
     }
 
