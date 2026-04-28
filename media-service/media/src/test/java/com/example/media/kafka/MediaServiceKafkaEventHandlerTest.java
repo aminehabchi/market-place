@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.MockBean;
@@ -53,16 +54,12 @@ class MediaServiceKafkaEventHandlerTest {
     @MockBean
     private ProductImageService productImageService;
 
-    @Autowired
     private UserEvents userEvents;
 
-    @Autowired
     private ProductEvents productEvents;
 
-    @Autowired
     private AvatarEvents avatarEvents;
 
-    @Autowired
     private ProductImagesEvents productImagesEvents;
 
     private UUID userId;

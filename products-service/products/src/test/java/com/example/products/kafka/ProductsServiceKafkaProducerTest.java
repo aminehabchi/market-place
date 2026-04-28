@@ -1,16 +1,15 @@
 package com.example.products.kafka;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import com.example.products.models.Product;
@@ -18,8 +17,15 @@ import com.example.shared.common.kafka.dtos.media.KafkaConfirmImageEvent;
 import com.example.shared.common.kafka.dtos.products.KafkaProductCreatedEvent;
 import com.example.shared.common.kafka.dtos.products.KafkaProductRemovedEvent;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
 @SuppressWarnings("null")
+@ExtendWith(MockitoExtension.class)
 class ProductsServiceKafkaProducerTest {
+    @Mock
     private KafkaTemplate<String, Object> kafkaTemplate;
     private ProductEvents productEvents;
     private MediaEvents mediaEvents;
@@ -29,7 +35,7 @@ class ProductsServiceKafkaProducerTest {
 
     @BeforeEach
     void setUp() {
-        kafkaTemplate = mock(KafkaTemplate.class);
+        // kafkaTemplate = new FakeKafkaTemplate();
         productEvents = new ProductEvents(kafkaTemplate);
         mediaEvents = new MediaEvents(kafkaTemplate);
 
@@ -39,46 +45,135 @@ class ProductsServiceKafkaProducerTest {
         testProduct.setUserId("user-123");
         testProduct.setPrice(29.99);
         testProduct.setQuantity(10);
-
         imageId = UUID.randomUUID();
     }
 
     @Test
     void sendProductCreatedEventPublishesCorrectTopicAndPayload() {
         productEvents.sendCreateEvent(testProduct);
-
-        verify(kafkaTemplate).send(eqTopic("create-product-events"), any(), any(KafkaProductCreatedEvent.class));
+        // FakeKafkaTemplate fake = (FakeKafkaTemplate) kafkaTemplate;
+        // assertEquals("create-product-events", fake.lastTopic);
+        // assertTrue(fake.lastData instanceof KafkaProductCreatedEvent);
+        verify(kafkaTemplate, times(1)).send(
+                eq("create-product-events"),
+                any(),
+                argThat(event -> event instanceof KafkaProductCreatedEvent));
     }
 
     @Test
     void sendProductRemovedEventPublishesCorrectTopicAndPayload() {
         productEvents.sendRemoveEvent(testProduct);
-
-        verify(kafkaTemplate).send(eqTopic("remove-product-events"), any(), any(KafkaProductRemovedEvent.class));
+        // FakeKafkaTemplate fake = (FakeKafkaTemplate) kafkaTemplate;
+        // assertEquals("remove-product-events", fake.lastTopic);
+        verify(kafkaTemplate, times(1)).send(
+                eq("remove-product-events"),
+                any(),
+                argThat(event -> event instanceof KafkaProductRemovedEvent));
+        // assertTrue(fake.lastData instanceof KafkaProductRemovedEvent);
     }
 
     @Test
     void confirmImageEventPublishesCorrectTopicAndPayload() {
         mediaEvents.confimImageEvent(imageId);
+        // FakeKafkaTemplate fake = (FakeKafkaTemplate) kafkaTemplate;
+        // assertEquals("confirm-image-events", fake.lastTopic);
+        verify(kafkaTemplate, times(1)).send(
+                eq("confirm-image-events"),
+                any(),
+                argThat(event -> event instanceof KafkaConfirmImageEvent));
 
-        verify(kafkaTemplate).send(eqTopic("confirm-image-events"), any(), any(KafkaConfirmImageEvent.class));
+        // assertTrue(fake.lastData instanceof KafkaConfirmImageEvent);
     }
 
     @Test
     void deleteImageEventPublishesCorrectTopicAndPayload() {
         mediaEvents.deleteImageEvent(imageId);
-
-        verify(kafkaTemplate).send(eqTopic("delete-image-events"), any(), any(KafkaConfirmImageEvent.class));
+        // FakeKafkaTemplate fake = (FakeKafkaTemplate) kafkaTemplate;
+        // assertEquals("delete-image-events", fake.lastTopic);
+        // assertTrue(fake.lastData instanceof KafkaConfirmImageEvent);
+        verify(kafkaTemplate, times(1)).send(
+                eq("delete-image-events"),
+                any(),
+                argThat(event -> event instanceof KafkaConfirmImageEvent));
     }
 
     @Test
     void productCreatedEventContainsCorrectData() {
         productEvents.sendCreateEvent(testProduct);
-
-        verify(kafkaTemplate).send(anyString(), any(), any(KafkaProductCreatedEvent.class));
+        // FakeKafkaTemplate fake = (FakeKafkaTemplate) kafkaTemplate;
+        // assertTrue(fake.lastData instanceof KafkaProductCreatedEvent);
+        verify(kafkaTemplate, times(1)).send(
+                eq("create-product-events"),
+                any(),
+                argThat(event -> event instanceof KafkaProductCreatedEvent));
     }
 
-    private String eqTopic(String topic) {
-        return org.mockito.ArgumentMatchers.eq(topic);
-    }
+    // private String eqTopic(String topic) {
+    // return org.mockito.ArgumentMatchers.eq(topic);
+    // }
+
+    // lightweight fake KafkaTemplate to avoid inline Mockito on KafkaTemplate
+    // static class FakeKafkaTemplate extends KafkaTemplate {
+    // String lastTopic;
+    // Object lastKey;
+    // Object lastData;
+
+    // @Override
+    // public
+    // org.springframework.util.concurrent.ListenableFuture<org.springframework.kafka.support.SendResult<String,
+    // Object>> send(
+    // String topic, Object key, Object data) {
+    // this.lastTopic = topic;
+    // this.lastKey = key;
+    // this.lastData = data;
+    // return null;
+    // }
+
+    // // Many methods in KafkaTemplate are not used by tests; provide no-op
+    // // implementations.
+    // @Override
+    // public
+    // org.springframework.util.concurrent.ListenableFuture<org.springframework.kafka.support.SendResult<String,
+    // Object>> send(
+    // String topic, Object data) {
+    // return send(topic, null, data);
+    // }
+
+    // @Override
+    // public
+    // org.springframework.util.concurrent.ListenableFuture<org.springframework.kafka.support.SendResult<String,
+    // Object>> send(
+    // org.springframework.kafka.support.SendResult<String, Object> sendResult) {
+    // return null;
+    // }
+
+    // // The KafkaTemplate interface has many methods; implement stubs returning
+    // null
+    // // or defaults.
+    // @Override
+    // public void flush() {
+    // }
+
+    // @Override
+    // public
+    // java.util.concurrent.Future<org.springframework.kafka.support.SendResult<String,
+    // Object>> sendOffsetsToTransaction(
+    // java.util.Map<org.apache.kafka.common.TopicPartition,
+    // org.apache.kafka.clients.consumer.OffsetAndMetadata> offsets,
+    // String consumerGroupId) {
+    // return null;
+    // }
+
+    // @Override
+    // public void sendOffsetsToTransaction(
+    // java.util.Map<org.apache.kafka.common.TopicPartition,
+    // org.apache.kafka.clients.consumer.OffsetAndMetadata> offsets,
+    // org.springframework.kafka.support.ProducerListener<String, Object> listener)
+    // {
+    // }
+    // // Remaining methods omitted for brevity; compile-time compatibility ensured
+    // by
+    // // declaring class as implementing KafkaTemplate via raw form in tests. If
+    // // needed, adjust to concrete type used in project.
+    // }
 }
