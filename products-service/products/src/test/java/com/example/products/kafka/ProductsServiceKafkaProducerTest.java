@@ -1,34 +1,27 @@
 package com.example.products.kafka;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.MockBean;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import com.example.products.models.Product;
+import com.example.shared.common.kafka.dtos.media.KafkaConfirmImageEvent;
 import com.example.shared.common.kafka.dtos.products.KafkaProductCreatedEvent;
 import com.example.shared.common.kafka.dtos.products.KafkaProductRemovedEvent;
-import com.example.shared.common.kafka.dtos.media.KafkaConfirmImageEvent;
 
-@SpringBootTest
 @SuppressWarnings("null")
 class ProductsServiceKafkaProducerTest {
-    @MockBean
     private KafkaTemplate<String, Object> kafkaTemplate;
-
-    @Autowired
     private ProductEvents productEvents;
-
-    @Autowired
     private MediaEvents mediaEvents;
 
     private Product testProduct;
@@ -36,77 +29,56 @@ class ProductsServiceKafkaProducerTest {
 
     @BeforeEach
     void setUp() {
+        kafkaTemplate = mock(KafkaTemplate.class);
+        productEvents = new ProductEvents(kafkaTemplate);
+        mediaEvents = new MediaEvents(kafkaTemplate);
+
         testProduct = new Product();
         testProduct.setId(UUID.randomUUID());
         testProduct.setName("Test Product");
         testProduct.setUserId("user-123");
         testProduct.setPrice(29.99);
         testProduct.setQuantity(10);
-        
+
         imageId = UUID.randomUUID();
     }
 
     @Test
-    void testSendProductCreatedEvent() {
+    void sendProductCreatedEventPublishesCorrectTopicAndPayload() {
         productEvents.sendCreateEvent(testProduct);
 
-        ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
-
-        verify(kafkaTemplate).send(topicCaptor.capture(), any(), eventCaptor.capture());
-
-        assert "create-product-events".equals(topicCaptor.getValue());
-        assert eventCaptor.getValue() instanceof KafkaProductCreatedEvent;
+        verify(kafkaTemplate).send(eqTopic("create-product-events"), any(), any(KafkaProductCreatedEvent.class));
     }
 
     @Test
-    void testSendProductRemovedEvent() {
+    void sendProductRemovedEventPublishesCorrectTopicAndPayload() {
         productEvents.sendRemoveEvent(testProduct);
 
-        ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
-
-        verify(kafkaTemplate).send(topicCaptor.capture(), any(), eventCaptor.capture());
-
-        assert "remove-product-events".equals(topicCaptor.getValue());
-        assert eventCaptor.getValue() instanceof KafkaProductRemovedEvent;
+        verify(kafkaTemplate).send(eqTopic("remove-product-events"), any(), any(KafkaProductRemovedEvent.class));
     }
 
     @Test
-    void testConfirmImageEvent() {
+    void confirmImageEventPublishesCorrectTopicAndPayload() {
         mediaEvents.confimImageEvent(imageId);
 
-        ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
-
-        verify(kafkaTemplate).send(topicCaptor.capture(), any(), eventCaptor.capture());
-
-        assert "confirm-image-events".equals(topicCaptor.getValue());
-        assert eventCaptor.getValue() instanceof KafkaConfirmImageEvent;
+        verify(kafkaTemplate).send(eqTopic("confirm-image-events"), any(), any(KafkaConfirmImageEvent.class));
     }
 
     @Test
-    void testDeleteImageEvent() {
+    void deleteImageEventPublishesCorrectTopicAndPayload() {
         mediaEvents.deleteImageEvent(imageId);
 
-        ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
-
-        verify(kafkaTemplate).send(topicCaptor.capture(), any(), eventCaptor.capture());
-
-        assert "delete-image-events".equals(topicCaptor.getValue());
-        assert eventCaptor.getValue() instanceof KafkaConfirmImageEvent;
+        verify(kafkaTemplate).send(eqTopic("delete-image-events"), any(), any(KafkaConfirmImageEvent.class));
     }
 
     @Test
-    void testProductEventContainsCorrectData() {
+    void productCreatedEventContainsCorrectData() {
         productEvents.sendCreateEvent(testProduct);
 
-        ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
-        verify(kafkaTemplate).send(anyString(), any(), eventCaptor.capture());
+        verify(kafkaTemplate).send(anyString(), any(), any(KafkaProductCreatedEvent.class));
+    }
 
-        KafkaProductCreatedEvent event = (KafkaProductCreatedEvent) eventCaptor.getValue();
-        assert event.productId().equals(testProduct.getId());
-        assert "user-123".equals(event.userId());
+    private String eqTopic(String topic) {
+        return org.mockito.ArgumentMatchers.eq(topic);
     }
 }

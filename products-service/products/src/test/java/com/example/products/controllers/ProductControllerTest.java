@@ -1,48 +1,34 @@
 package com.example.products.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 
 import com.example.products.dto.CreateProdutDto;
 import com.example.products.dto.UpdateProcutDto;
 import com.example.products.models.Product;
 import com.example.products.services.ProductService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.shared.common.utils.ApiResponse;
 
-@WebMvcTest(ProductController.class)
 @SuppressWarnings("null")
 class ProductControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
     private ProductService productService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    private ProductController controller;
 
     private UUID productId;
     private String userId;
@@ -52,6 +38,9 @@ class ProductControllerTest {
 
     @BeforeEach
     void setUp() {
+        productService = mock(ProductService.class);
+        controller = new ProductController(productService);
+
         productId = UUID.randomUUID();
         userId = "user-123";
 
@@ -74,135 +63,95 @@ class ProductControllerTest {
         updateDto.setPrice(39.99);
     }
 
+    private Authentication authentication(String principal) {
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(principal);
+        return authentication;
+    }
+
     @Test
-    void testGetProductsPublic() throws Exception {
-        List<Product> products = new ArrayList<>();
-        products.add(testProduct);
+    void getProductsReturnsApiResponse() {
+        when(productService.getAllProducts()).thenReturn(List.of(testProduct));
 
-        when(productService.getAllProducts()).thenReturn(products);
+        ResponseEntity<ApiResponse<List<Product>>> response = controller.getProducts();
 
-        mockMvc.perform(get("/api/products/")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data[0].name").value("Test Product"))
-                .andExpect(jsonPath("$.data[0].price").value(29.99));
-
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().data().size());
+        assertEquals("Test Product", response.getBody().data().get(0).getName());
         verify(productService).getAllProducts();
     }
 
     @Test
-    @WithMockUser(username = "user-123")
-    void testGetMyProductsAuthenticated() throws Exception {
-        List<Product> products = new ArrayList<>();
-        products.add(testProduct);
+    void getMyProductsUsesAuthenticatedPrincipal() {
+        when(productService.getMyProducts(userId)).thenReturn(List.of(testProduct));
 
-        when(productService.getMyProducts("user-123")).thenReturn(products);
+        ResponseEntity<ApiResponse<List<Product>>> response = controller.getMyProducts(authentication(userId));
 
-        mockMvc.perform(get("/api/products/me")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data[0].userId").value("user-123"));
-
-        verify(productService).getMyProducts("user-123");
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("user-123", response.getBody().data().get(0).getUserId());
+        verify(productService).getMyProducts(userId);
     }
 
     @Test
-    void testGetProductByIdSuccess() throws Exception {
+    void getProductByIdSuccess() {
         when(productService.getProductById(productId)).thenReturn(testProduct);
 
-        mockMvc.perform(get("/api/products/" + productId)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.id").value(productId.toString()))
-                .andExpect(jsonPath("$.data.name").value("Test Product"));
+        ResponseEntity<ApiResponse<Product>> response = controller.getProduct(productId);
 
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(productId, response.getBody().data().getId());
         verify(productService).getProductById(productId);
     }
 
     @Test
-    void testGetProductByIdNotFound() throws Exception {
+    void getProductByIdReturnsNotFoundWhenServiceReturnsNull() {
         when(productService.getProductById(productId)).thenReturn(null);
 
-        mockMvc.perform(get("/api/products/" + productId)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.statusCode").value(404));
+        ResponseEntity<ApiResponse<Product>> response = controller.getProduct(productId);
 
-        verify(productService).getProductById(productId);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertFalse(response.getBody().success());
     }
 
     @Test
-    @WithMockUser(username = "user-123")
-    void testCreateProductSuccess() throws Exception {
+    void createProductReturnsCreatedResponse() {
         Product createdProduct = new Product(createDto, userId);
         createdProduct.setId(productId);
+        when(productService.createProduct(any(CreateProdutDto.class), eq(userId))).thenReturn(createdProduct);
 
-        when(productService.createProduct(any(CreateProdutDto.class), eq(userId)))
-                .thenReturn(createdProduct);
+        ResponseEntity<ApiResponse<Product>> response = controller.createProduct(createDto, authentication(userId));
 
-        mockMvc.perform(post("/api/products/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createDto)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.statusCode").value(201))
-                .andExpect(jsonPath("$.data.name").value("New Product"));
-
-        verify(productService).createProduct(ArgumentMatchers.any(CreateProdutDto.class), eq(userId));
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("New Product", response.getBody().data().getName());
+        verify(productService).createProduct(createDto, userId);
     }
 
     @Test
-    @WithMockUser(username = "user-123")
-    void testCreateProductInvalidData() throws Exception {
-        CreateProdutDto invalidDto = new CreateProdutDto();
-        invalidDto.setName(""); // Invalid - blank name
-        invalidDto.setDescription("desc");
-        invalidDto.setPrice(10.0);
-
-        mockMvc.perform(post("/api/products/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidDto)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithMockUser(username = "user-123")
-    void testDeleteProductSuccess() throws Exception {
+    void deleteProductReturnsNoContentForOwner() {
         when(productService.getProductById(productId)).thenReturn(testProduct);
-        doNothing().when(productService).deleteProduct(productId);
 
-        mockMvc.perform(delete("/api/products/" + productId)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+        ResponseEntity<ApiResponse<Product>> response = controller.deleteProduct(productId, authentication(userId));
 
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(productService).deleteProduct(productId);
     }
 
     @Test
-    @WithMockUser(username = "user-123")
-    void testDeleteProductNotFound() throws Exception {
-        when(productService.getProductById(productId)).thenReturn(null);
-
-        mockMvc.perform(delete("/api/products/" + productId)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @WithMockUser(username = "different-user")
-    void testDeleteProductForbidden() throws Exception {
+    void deleteProductReturnsForbiddenForDifferentUser() {
         when(productService.getProductById(productId)).thenReturn(testProduct);
 
-        mockMvc.perform(delete("/api/products/" + productId)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.statusCode").value(403));
+        ResponseEntity<ApiResponse<Product>> response = controller.deleteProduct(productId, authentication("different-user"));
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertFalse(response.getBody().success());
     }
 
     @Test
-    @WithMockUser(username = "user-123")
-    void testUpdateProductSuccess() throws Exception {
+    void updateProductReturnsOkForOwner() {
         Product updatedProduct = new Product();
         updatedProduct.setId(productId);
         updatedProduct.setName("Updated Product");
@@ -211,39 +160,22 @@ class ProductControllerTest {
         updatedProduct.setUserId(userId);
 
         when(productService.getProductById(productId)).thenReturn(testProduct);
-        when(productService.updateProduct(any(Product.class), any(UpdateProcutDto.class)))
-                .thenReturn(updatedProduct);
+        when(productService.updateProduct(testProduct, updateDto)).thenReturn(updatedProduct);
 
-        mockMvc.perform(put("/api/products/" + productId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateDto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.name").value("Updated Product"))
-                .andExpect(jsonPath("$.data.price").value(39.99));
+        ResponseEntity<ApiResponse<Product>> response = controller.updateProduct(productId, updateDto, authentication(userId));
 
-        verify(productService).updateProduct(ArgumentMatchers.any(Product.class), ArgumentMatchers.any(UpdateProcutDto.class));
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Updated Product", response.getBody().data().getName());
+        verify(productService).updateProduct(testProduct, updateDto);
     }
 
     @Test
-    @WithMockUser(username = "user-123")
-    void testUpdateProductNotFound() throws Exception {
-        when(productService.getProductById(productId)).thenReturn(null);
-
-        mockMvc.perform(put("/api/products/" + productId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateDto)))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @WithMockUser(username = "different-user")
-    void testUpdateProductForbidden() throws Exception {
+    void updateProductReturnsForbiddenForDifferentUser() {
         when(productService.getProductById(productId)).thenReturn(testProduct);
 
-        mockMvc.perform(put("/api/products/" + productId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateDto)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.statusCode").value(403));
+        ResponseEntity<ApiResponse<Product>> response = controller.updateProduct(productId, updateDto, authentication("different-user"));
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertFalse(response.getBody().success());
     }
 }

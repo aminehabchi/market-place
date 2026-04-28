@@ -3,6 +3,7 @@ package com.example.products.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.products.dto.CreateProdutDto;
@@ -32,15 +34,14 @@ class ProductServiceTest {
     private ProductRepository productRepository;
 
     @Mock
-    private ProductEvents productEvents;
-
-    @Mock
-    private MediaEvents mediaEvents;
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     private ProductService productService;
 
     @BeforeEach
     void setUp() {
+        ProductEvents productEvents = new ProductEvents(kafkaTemplate);
+        MediaEvents mediaEvents = new MediaEvents(kafkaTemplate);
         productService = new ProductService(productRepository, productEvents, mediaEvents);
     }
 
