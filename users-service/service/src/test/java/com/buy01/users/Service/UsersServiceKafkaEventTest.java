@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
@@ -32,18 +32,18 @@ import com.example.shared.common.kafka.dtos.users.KafkaUserRemovedEvent;
 
 @SpringBootTest
 @TestPropertySource(properties = {
-    "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}",
-    "logging.level.org.apache.kafka=WARN"
+        "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}",
+        "logging.level.org.apache.kafka=WARN"
 })
 @SuppressWarnings("null")
 class UsersServiceKafkaEventTest {
-    @MockBean
+    @MockitoBean
     private UserRepository userRepository;
 
-    @MockBean
+    @MockitoBean
     private PasswordEncoder passwordEncoder;
 
-    @MockBean
+    @MockitoBean
     private JwtUtils jwtUtils;
 
     @Autowired
@@ -71,12 +71,11 @@ class UsersServiceKafkaEventTest {
     @Test
     void testUserCreatedEventEmittedOnRegistration() {
         RegisterReqDTOs registerDto = new RegisterReqDTOs(
-            userEmail,
-            userName,
-            userPassword,
-            "BUYER",
-            null
-        );
+                userEmail,
+                userName,
+                userPassword,
+                "BUYER",
+                null);
 
         User newUser = new User(userId, userName, userEmail, "hashed-password", "BUYER", null);
 
@@ -88,7 +87,8 @@ class UsersServiceKafkaEventTest {
         authService.register(registerDto);
 
         // Verify that events were sent to Kafka
-        // We can't directly verify Kafka sends without embedded Kafka, but we verify the service was called
+        // We can't directly verify Kafka sends without embedded Kafka, but we verify
+        // the service was called
         verify(userRepository).save(any(User.class));
     }
 
@@ -98,7 +98,8 @@ class UsersServiceKafkaEventTest {
         ProfileUpdateReqDTOs updateDto = new ProfileUpdateReqDTOs("New Name", null);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userRepository.save(any(User.class))).thenReturn(new User(userId, "New Name", userEmail, "hashed-password", "BUYER", null));
+        when(userRepository.save(any(User.class)))
+                .thenReturn(new User(userId, "New Name", userEmail, "hashed-password", "BUYER", null));
 
         profileService.updateCurrentProfile(updateDto);
 
@@ -120,12 +121,11 @@ class UsersServiceKafkaEventTest {
     void testRegistrationWithAvatarEmitsConfirmAvatarEvent() {
         UUID avatarId = UUID.randomUUID();
         RegisterReqDTOs registerDto = new RegisterReqDTOs(
-            userEmail,
-            userName,
-            userPassword,
-            "SELLER",
-            avatarId
-        );
+                userEmail,
+                userName,
+                userPassword,
+                "SELLER",
+                avatarId);
 
         User newUser = new User(userId, userName, userEmail, "hashed-password", "SELLER", avatarId.toString());
 

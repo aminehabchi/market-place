@@ -18,13 +18,13 @@ class ProductsServiceKafkaEventHandlerTest {
 
     private UserEvents userEvents;
 
-    private UUID userId;
+    private String userId;
 
     @BeforeEach
     void setUp() {
         usersService = new FakeUsersService();
         userEvents = new UserEvents(usersService);
-        userId = UUID.randomUUID();
+        userId = UUID.randomUUID().toString();
     }
 
     @Test
