@@ -51,6 +51,22 @@ pipeline {
       }
     }
 
+    stage('SonarQube media-service Analysis') {
+      steps {
+        dir('media-service') {
+            withSonarQubeEnv('SonarQube-Prod') {
+                sh '''
+                    mvn clean verify sonar:sonar \
+                    -Dsonar.projectKey=media-service \
+                    -Dsonar.projectName="media-service"
+                    echo "HOST=$SONAR_HOST_URL"
+                    echo "TOKEN EXISTS=${SONAR_AUTH_TOKEN:+YES}"
+                '''
+            }
+        }
+      }
+    }
+
     stage('Deploy') {
       steps {
         script {
