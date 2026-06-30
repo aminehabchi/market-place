@@ -67,6 +67,22 @@ pipeline {
       }
     }
 
+    stage('SonarQube user-service Analysis') {
+      steps {
+        dir('user-service') {
+            withSonarQubeEnv('SonarQube-Prod') {
+                sh '''
+                    mvn clean verify sonar:sonar \
+                    -Dsonar.projectKey=user-service \
+                    -Dsonar.projectName="user-service"
+                    echo "HOST=$SONAR_HOST_URL"
+                    echo "TOKEN EXISTS=${SONAR_AUTH_TOKEN:+YES}"
+                '''
+            }
+        }
+      }
+    }
+
     stage('Deploy') {
       steps {
         script {
