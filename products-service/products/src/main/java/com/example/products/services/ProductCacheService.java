@@ -39,7 +39,7 @@ public class ProductCacheService {
         }
 
         String cacheKey = key(product.getId());
-        redisTemplate.opsForValue().set(cacheKey, product, DEFAULT_TTL, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(cacheKey, product, DEFAULT_TTL.getSeconds(), TimeUnit.SECONDS);
     }
 
     public void evictProduct(UUID id) {
