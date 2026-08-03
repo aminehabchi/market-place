@@ -43,6 +43,7 @@ public class ProductService {
     private final ProductSearchService productSearchService;
     private final ProductRatingRepository productRatingRepository;
     private final MongoTemplate mongoTemplate;
+    private final ProductCacheService productCacheService;
 
     @Autowired
     public ProductService(ProductRepository productRepository,
@@ -50,13 +51,15 @@ public class ProductService {
             MediaEvents mediaEvents,
             ProductSearchService productSearchService,
             ProductRatingRepository productRatingRepository,
-            MongoTemplate mongoTemplate) {
+            MongoTemplate mongoTemplate,
+            ProductCacheService productCacheService) {
         this.productRepository = productRepository;
         this.productEvents = productEvents;
         this.mediaEvents = mediaEvents;
         this.productSearchService = productSearchService;
         this.productRatingRepository = productRatingRepository;
         this.mongoTemplate = mongoTemplate;
+        this.productCacheService = productCacheService;
     }
 
     public ProductService(ProductRepository productRepository,
@@ -65,7 +68,7 @@ public class ProductService {
             ProductSearchService productSearchService,
             ProductRatingRepository productRatingRepository) {
         this(productRepository, productEvents, mediaEvents, productSearchService,
-                productRatingRepository, null);
+            productRatingRepository, null, null);
     }
 
     public List<Product> getAllProducts() {
@@ -115,8 +118,22 @@ public class ProductService {
     }
 
     public Product getProductById(UUID id) {
-        return productRepository.findById(id)
+        // Try cache first
+        try {
+            Product cached = productCacheService != null ? productCacheService.getCachedProduct(id) : null;
+            if (cached != null) return cached;
+        } catch (Exception e) {
+            // ignore cache errors and fallback to DB
+        }
+
+        Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+        try {
+            if (productCacheService != null) productCacheService.putProduct(product);
+        } catch (Exception e) {
+            // ignore cache set failures
+        }
+        return product;
     }
 
     public Product createProduct(CreateProdutDto productDto, String userId) {
@@ -124,6 +141,12 @@ public class ProductService {
 
         // 1 Save first (source of truth)
         Product saved = productRepository.save(product);
+
+        try {
+            if (productCacheService != null) productCacheService.putProduct(saved);
+        } catch (Exception e) {
+            // ignore cache
+        }
 
         // 2 Then emit events
         productEvents.sendCreateEvent(saved);
@@ -137,6 +160,11 @@ public class ProductService {
 
         productRepository.deleteById(id);
         productRatingRepository.deleteByProductId(id);
+        try {
+            if (productCacheService != null) productCacheService.evictProduct(id);
+        } catch (Exception e) {
+            // ignore
+        }
         productEvents.sendRemoveEvent(product);
         mediaEvents.deleteImageEvents(product.getImages());
     }
@@ -180,6 +208,11 @@ public class ProductService {
 
         Product saved = productRepository.save(product);
         productEvents.sendUpdateEvent(saved);
+        try {
+            if (productCacheService != null) productCacheService.putProduct(saved);
+        } catch (Exception e) {
+            // ignore
+        }
         return saved;
     }
 
