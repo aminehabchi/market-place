@@ -199,6 +199,12 @@ public class ProductService {
 
             Product saved = productRepository.save(product);
 
+            try {
+                if (productCacheService != null) productCacheService.putProduct(saved);
+            } catch (Exception e) {
+                // ignore
+            }
+
             mediaEvents.confirmImageEvents(requestedImages);
             mediaEvents.deleteImageEvents(imagesToDelete(oldImages, requestedImages));
             productEvents.sendUpdateEvent(saved);
