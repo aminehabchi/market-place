@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.media.models.UserAvatar;
 import com.example.media.dto.MediaStatusResponse;
+import com.example.media.services.ImageValidator;
 import com.example.media.services.AvatarService;
 import com.example.media.stores.UserAvatarContentStore;
 import com.example.shared.common.types.ImageStatus;
@@ -51,6 +52,20 @@ public class UserController {
                     .badRequest()
                     .body("File must be an image");
         }
+
+        if (fileBytes.length > ImageValidator.MAX_IMAGE_BYTES) {
+            return ResponseEntity
+                    .status(HttpStatus.PAYLOAD_TOO_LARGE)
+                    .body("Image must be 5MB or smaller");
+        }
+
+        if (!ImageValidator.matchesSignature(mimeType, fileBytes)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("File content does not match an allowed image type");
+        }
+
+        mimeType = ImageValidator.normalize(mimeType);
 
         String userId = extractUserId(authentication);
 
@@ -106,7 +121,9 @@ public class UserController {
             try (InputStream is = contentStore.getContent(avatar)) {
                 byte[] bytes = is.readAllBytes();
                 return ResponseEntity.ok()
-                        .contentType(MediaType.parseMediaType(avatar.getMimeType()))
+                        .contentType(MediaType.parseMediaType(ImageValidator.safeContentType(avatar.getMimeType())))
+                        .header("X-Content-Type-Options", "nosniff")
+                        .header("Content-Security-Policy", "default-src 'none'; sandbox")
                         .contentLength(avatar.getContentLength())
                         .body(bytes);
             }

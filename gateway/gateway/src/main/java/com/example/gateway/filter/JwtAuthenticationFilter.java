@@ -1,7 +1,7 @@
 package com.example.gateway.filter;
 
 import java.security.interfaces.RSAPublicKey;
-import java.util.List;
+import java.util.Set;
 
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -20,6 +20,13 @@ import reactor.core.publisher.Mono;
 @Component
 public class JwtAuthenticationFilter implements GlobalFilter {
 
+    static final String USER_ID_HEADER = "X-User-Id";
+    static final String USER_ROLE_HEADER = "X-User-Role";
+    private static final Set<String> PUBLIC_PATHS = Set.of(
+            "/api/users/login",
+            "/api/users/register",
+            "/api/payments/webhooks/stripe");
+
     private final RSAPublicKey rsaPublicKey;
     private final JwtParser jwtParser;
 
@@ -30,59 +37,54 @@ public class JwtAuthenticationFilter implements GlobalFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        ServerHttpRequest request = exchange.getRequest();
+        // Identity headers are trusted by downstream services, so they must only
+        // ever come from a verified token, never from the client.
+        ServerHttpRequest request = exchange.getRequest().mutate()
+                .headers(headers -> {
+                    headers.remove(USER_ID_HEADER);
+                    headers.remove(USER_ROLE_HEADER);
+                })
+                .build();
 
         if (isPublicEndpoint(request.getPath().value())) {
-            return chain.filter(exchange);
+            return chain.filter(exchange.mutate().request(request).build());
         }
 
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            System.out.println("logs ============================================ Guest");
             ServerHttpRequest modifiedRequest = request.mutate()
-                    .header("X-User-Role", "GUEST")
+                    .header(USER_ROLE_HEADER, "GUEST")
                     .build();
             return chain.filter(exchange.mutate().request(modifiedRequest).build());
-        } else {
-            System.out.println("logs ============================================ jwt");
-
-            String token = authHeader.substring(7);
-
-            try {
-                // System.out.println("subject: " + rsaPublicKey.getEncoded());
-                var claims = jwtParser.parseSignedClaims(token).getPayload();
-                String userId = claims.getSubject();
-                String role = claims.get("role", String.class);
-
-                // if (!hasAccess(request.getPath().value(), role)) {
-                // return sendForbiddenError(exchange.getResponse(), "Insufficient
-                // permissions");
-                // }
-
-                ServerHttpRequest modifiedRequest = request.mutate()
-                        .header("X-User-Id", userId)
-                        .header("X-User-Role", role)
-                        .build();
-
-                return chain.filter(exchange.mutate().request(modifiedRequest).build());
-
-            } catch (SignatureException e) {
-                return sendUnauthorizedError(exchange.getResponse(), "Invalid token signature");
-            } catch (Exception e) {
-                return sendUnauthorizedError(exchange.getResponse(), "Invalid or expired token: " + e.getMessage());
-            }
         }
 
+        String token = authHeader.substring(7);
+
+        try {
+            var claims = jwtParser.parseSignedClaims(token).getPayload();
+            String userId = claims.getSubject();
+            String role = claims.get("role", String.class);
+            if (userId == null || userId.isBlank() || role == null || role.isBlank()) {
+                return sendUnauthorizedError(exchange.getResponse(), "Invalid token claims");
+            }
+
+            ServerHttpRequest modifiedRequest = request.mutate()
+                    .header(USER_ID_HEADER, userId)
+                    .header(USER_ROLE_HEADER, role)
+                    .build();
+
+            return chain.filter(exchange.mutate().request(modifiedRequest).build());
+
+        } catch (SignatureException e) {
+            return sendUnauthorizedError(exchange.getResponse(), "Invalid token signature");
+        } catch (Exception e) {
+            return sendUnauthorizedError(exchange.getResponse(), "Invalid or expired token");
+        }
     }
 
     private boolean isPublicEndpoint(String path) {
-        System.out.println("public path ------------------------- " + path);
-        List<String> publicPaths = List.of(
-                "/api/users/login",
-                "/api/payments/webhooks/stripe",
-                // "/api/products",
-                "/api/users/register");
-        return publicPaths.stream().anyMatch(path::startsWith);
+        String normalized = path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
+        return PUBLIC_PATHS.contains(normalized);
     }
 
     // private boolean hasAccess(String path, String role) {

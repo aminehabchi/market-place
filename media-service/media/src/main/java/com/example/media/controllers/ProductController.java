@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.media.models.ProductImage;
 import com.example.media.dto.MediaStatusResponse;
 import com.example.media.repositories.ProductImageRepository;
+import com.example.media.services.ImageValidator;
 import com.example.media.services.ProductImageService;
 import com.example.media.stores.ProductimageContentStore;
 import com.example.shared.common.types.ImageStatus;
@@ -56,6 +57,20 @@ public class ProductController {
                     .badRequest()
                     .body("File must be an image");
         }
+
+        if (fileBytes.length > ImageValidator.MAX_IMAGE_BYTES) {
+            return ResponseEntity
+                    .status(HttpStatus.PAYLOAD_TOO_LARGE)
+                    .body("Image must be 5MB or smaller");
+        }
+
+        if (!ImageValidator.matchesSignature(mimeType, fileBytes)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("File content does not match an allowed image type");
+        }
+
+        mimeType = ImageValidator.normalize(mimeType);
 
         String userId = extractUserId(authentication);
 
@@ -117,7 +132,9 @@ public class ProductController {
             byte[] bytes = is.readAllBytes();
 
             return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(image.getMimeType()))
+                    .contentType(MediaType.parseMediaType(ImageValidator.safeContentType(image.getMimeType())))
+                    .header("X-Content-Type-Options", "nosniff")
+                    .header("Content-Security-Policy", "default-src 'none'; sandbox")
                     .contentLength(image.getContentLength())
                     .body(bytes);
 

@@ -74,7 +74,7 @@
             <i class="fa fa-cloud-arrow-up"></i>
             <span>Upload product photos</span>
             <small>JPG, PNG, or WebP. Up to 5 images.</small>
-            <input type="file" accept="image/*" multiple (change)="onImageSelected($event)" class="hidden" />
+            <input type="file" accept="image/png,image/jpeg,image/gif,image/webp" multiple (change)="onImageSelected($event)" class="hidden" />
           </label>
           }
 
@@ -97,7 +97,7 @@
           <label class="add-more-images">
             <i class="fa fa-plus"></i>
             <span>Add more photos</span>
-            <input type="file" accept="image/*" multiple (change)="onImageSelected($event)" class="hidden" />
+            <input type="file" accept="image/png,image/jpeg,image/gif,image/webp" multiple (change)="onImageSelected($event)" class="hidden" />
           </label>
           }
           }

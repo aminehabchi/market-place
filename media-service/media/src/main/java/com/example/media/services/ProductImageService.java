@@ -25,11 +25,7 @@ public class ProductImageService {
     }
 
     public boolean isImageMimeType(String mimeType) {
-        if (mimeType == null) {
-            return false;
-        }
-
-        return mimeType.toLowerCase().startsWith("image/");
+        return ImageValidator.isAllowedMimeType(mimeType);
     }
 
     @Transactional

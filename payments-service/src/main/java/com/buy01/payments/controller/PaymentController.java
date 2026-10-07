@@ -32,6 +32,11 @@ public class PaymentController {
     public ResponseEntity<CheckoutSessionResponse> createCheckoutSession(
             @RequestBody @Valid CreateCheckoutSessionRequest request,
             @RequestHeader(name = "X-User-Id", required = false) String userId) {
+        // Reserving stock is only allowed for signed-in buyers; otherwise anonymous
+        // clients could hold every product's inventory for the session lifetime.
+        if (userId == null || userId.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Sign in to purchase");
+        }
         try {
             return ResponseEntity.ok(stripeCheckoutService.createCheckoutSession(request, userId));
         } catch (IllegalStateException e) {
