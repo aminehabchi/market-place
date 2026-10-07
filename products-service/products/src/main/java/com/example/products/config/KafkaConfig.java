@@ -40,7 +40,8 @@ public class KafkaConfig {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, consumerGroupId);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        // Only our own event DTOs may be named in type headers (java.util/java.lang are always trusted).
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "com.example.*");
 
         return props;
     }

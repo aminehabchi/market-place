@@ -5,12 +5,14 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -73,7 +75,7 @@ class MediaControllersTest {
                 imageId = UUID.randomUUID();
                 avatarId = UUID.randomUUID();
                 userId = "user-123";
-                testFileBytes = "fake-image-data".getBytes();
+                testFileBytes = new byte[] { (byte) 0x89, 'P', 'N', 'G', 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 0 };
                 imageMimeType = "image/png";
         }
 
@@ -111,6 +113,38 @@ class MediaControllersTest {
                                 .content(testFileBytes))
                                 .andExpect(status().isBadRequest())
                                 .andExpect(content().string("File must be an image"));
+        }
+
+        @Test
+        @WithMockUser(username = "user-123")
+        void testUploadProductImageRejectsSvgDisguisedAsPng() throws Exception {
+                when(productImageService.isImageMimeType(imageMimeType)).thenReturn(true);
+
+                mockMvc.perform(post("/products/")
+                                .header("Content-Type", imageMimeType)
+                                .content("<svg xmlns=\"http://www.w3.org/2000/svg\" onload=\"alert(1)\"/>".getBytes()))
+                                .andExpect(status().isBadRequest());
+
+                verify(productImageService, never()).uploadAvatar(any(ByteArrayInputStream.class), anyString(), anyString());
+        }
+
+        @Test
+        @WithMockUser(username = "user-123")
+        void testGetProductImageServesLegacySvgAsDownload() throws Exception {
+                ProductImage productImage = new ProductImage();
+                productImage.setId(imageId);
+                productImage.setMimeType("image/svg+xml");
+                productImage.setContentLength((long) testFileBytes.length);
+
+                when(productImageRepository.findById(imageId))
+                                .thenReturn(Optional.of(productImage));
+                when(productContentStore.getContent(productImage))
+                                .thenReturn(new ByteArrayInputStream(testFileBytes));
+
+                mockMvc.perform(get("/products/" + imageId))
+                                .andExpect(status().isOk())
+                                .andExpect(header().string("Content-Type", "application/octet-stream"))
+                                .andExpect(header().string("X-Content-Type-Options", "nosniff"));
         }
 
         @Test

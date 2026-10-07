@@ -13,4 +13,5 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8010
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Size the heap from the container memory limit (mem_limit in docker-compose).
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=60.0", "-XX:+ExitOnOutOfMemoryError", "-jar", "app.jar"]

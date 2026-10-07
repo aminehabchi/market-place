@@ -4,6 +4,8 @@ services:
       context: ./eureka
       dockerfile: Dockerfile
     container_name: eureka-server
+    mem_limit: 384m
+    restart: unless-stopped
     networks:
       - shared-net
     volumes:

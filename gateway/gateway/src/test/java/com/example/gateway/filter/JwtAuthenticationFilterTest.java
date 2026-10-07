@@ -14,6 +14,7 @@ import java.util.Date;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -234,5 +235,59 @@ class JwtAuthenticationFilterTest {
         StepVerifier.create(result)
             .expectComplete()
             .verify();
+    }
+
+    private ServerHttpRequest forwardedRequest(MockServerHttpRequest request) {
+        ArgumentCaptor<ServerWebExchange> captor = ArgumentCaptor.forClass(ServerWebExchange.class);
+        StepVerifier.create(filter.filter(createExchange(request), chain)).expectComplete().verify();
+        verify(chain).filter(captor.capture());
+        return captor.getValue().getRequest();
+    }
+
+    @Test
+    void testGuestRequestCannotSpoofUserId() {
+        ServerHttpRequest forwarded = forwardedRequest(MockServerHttpRequest
+            .get("/api/users/me")
+            .header("X-User-Id", "victim")
+            .header("X-User-Role", "ADMIN")
+            .build());
+
+        assertNull(forwarded.getHeaders().getFirst("X-User-Id"));
+        assertEquals("GUEST", forwarded.getHeaders().getFirst("X-User-Role"));
+    }
+
+    @Test
+    void testPublicEndpointStripsIdentityHeaders() {
+        ServerHttpRequest forwarded = forwardedRequest(MockServerHttpRequest
+            .post("/api/users/login")
+            .header("X-User-Id", "victim")
+            .header("X-User-Role", "ADMIN")
+            .build());
+
+        assertNull(forwarded.getHeaders().getFirst("X-User-Id"));
+        assertNull(forwarded.getHeaders().getFirst("X-User-Role"));
+    }
+
+    @Test
+    void testPublicPathPrefixIsNotPublic() {
+        ServerHttpRequest forwarded = forwardedRequest(MockServerHttpRequest
+            .get("/api/users/loginx")
+            .build());
+
+        assertEquals("GUEST", forwarded.getHeaders().getFirst("X-User-Role"));
+    }
+
+    @Test
+    void testValidJwtOverridesSpoofedHeaders() {
+        String token = generateValidToken("real-user", "BUYER");
+        ServerHttpRequest forwarded = forwardedRequest(MockServerHttpRequest
+            .get("/api/users/me")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+            .header("X-User-Id", "victim")
+            .header("X-User-Role", "ADMIN")
+            .build());
+
+        assertEquals(java.util.List.of("real-user"), forwarded.getHeaders().get("X-User-Id"));
+        assertEquals(java.util.List.of("BUYER"), forwarded.getHeaders().get("X-User-Role"));
     }
 }

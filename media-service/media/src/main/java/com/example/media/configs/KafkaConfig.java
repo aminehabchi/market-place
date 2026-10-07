@@ -49,7 +49,8 @@ public class KafkaConfig {
     @Bean
     public ConsumerFactory<String, Object> consumerFactory() {
         JsonDeserializer<Object> deserializer = new JsonDeserializer<>();
-        deserializer.addTrustedPackages("*"); // trust all packages for JSON
+        // Only our own event DTOs may be named in type headers (java.util/java.lang are always trusted).
+        deserializer.addTrustedPackages("com.example.*");
         return new DefaultKafkaConsumerFactory<>(
                 consumerConfigs(),
                 new StringDeserializer(),

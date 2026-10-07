@@ -99,7 +99,7 @@
                             <i class="fa fa-cloud-arrow-up"></i>
                             Upload image
                         </label>
-                        <input id="avatar" name="avatar" type="file" accept="image/*" class="file-input"
+                        <input id="avatar" name="avatar" type="file" accept="image/png,image/jpeg,image/gif,image/webp" class="file-input"
                             (change)="onAvatarSelected($event)" />
 
                         @if (selectedAvatar()) {

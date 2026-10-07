@@ -38,7 +38,7 @@ class PaymentControllerTest {
 
         ResponseStatusException error = assertThrows(
                 ResponseStatusException.class,
-                () -> new PaymentController(service).createCheckoutSession(request, null));
+                () -> new PaymentController(service).createCheckoutSession(request, "user-1"));
 
         assertEquals(HttpStatus.SERVICE_UNAVAILABLE, error.getStatusCode());
     }
@@ -50,9 +50,20 @@ class PaymentControllerTest {
 
         ResponseStatusException error = assertThrows(
                 ResponseStatusException.class,
-                () -> new PaymentController(service).createCheckoutSession(request, null));
+                () -> new PaymentController(service).createCheckoutSession(request, "user-1"));
 
         assertEquals(HttpStatus.BAD_GATEWAY, error.getStatusCode());
+    }
+
+    @Test
+    void rejectsAnonymousCheckout() {
+        StripeCheckoutService service = serviceReturning(new CheckoutSessionResponse("cs_1", "https://checkout.test"));
+
+        ResponseStatusException error = assertThrows(
+                ResponseStatusException.class,
+                () -> new PaymentController(service).createCheckoutSession(request, null));
+
+        assertEquals(HttpStatus.UNAUTHORIZED, error.getStatusCode());
     }
 
     private StripeCheckoutService serviceReturning(CheckoutSessionResponse response) {

@@ -4,6 +4,9 @@ services:
       context: ./database
       dockerfile: dockerfile
     container_name: media-service-mongodb
+    mem_limit: 384m
+    restart: unless-stopped
+    command: ["--wiredTigerCacheSizeGB", "0.25"]
     env_file:
       - .env.media
     volumes:
@@ -21,6 +24,8 @@ services:
       context: ../
       dockerfile: ./media-service/media/Dockerfile
     container_name: media-service
+    mem_limit: 512m
+    restart: unless-stopped
     env_file:
       - .env.media
     depends_on:

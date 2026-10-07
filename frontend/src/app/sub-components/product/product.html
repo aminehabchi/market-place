@@ -11,7 +11,7 @@
     <button class="media-edit-button" (click)="fileInput.click()" aria-label="Change product image">
       <i class="fa fa-camera"></i>
     </button>
-    <input type="file" #fileInput class="hidden" (change)="onImageSelected($event)" accept="image/*" />
+    <input type="file" #fileInput class="hidden" (change)="onImageSelected($event)" accept="image/png,image/jpeg,image/gif,image/webp" />
     }
   </div>
 
