@@ -2,8 +2,11 @@ services:
   redis:
     image: redis:7
     container_name: redis
+    mem_limit: 192m
+    command: ["redis-server", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
     ports:
-      - "6379:6379" 
+      # Loopback only: Docker-published ports bypass ufw. Use an SSH tunnel to reach it.
+      - "127.0.0.1:6379:6379"
     networks:
       - shared-net
     restart: unless-stopped

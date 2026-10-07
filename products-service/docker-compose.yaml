@@ -2,6 +2,9 @@ services:
   products-service-mongodb:
     build: ./database
     container_name: products-service-mongodb
+    mem_limit: 384m
+    restart: unless-stopped
+    command: ["--wiredTigerCacheSizeGB", "0.25"]
     env_file:
       - .env.product
     volumes:
@@ -19,6 +22,8 @@ services:
       context: ../
       dockerfile: products-service/products/Dockerfile
     container_name: products-service
+    mem_limit: 640m
+    restart: unless-stopped
     env_file:
       - .env.product
 

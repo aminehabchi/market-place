@@ -4,6 +4,8 @@ services:
       context: ./gateway
       dockerfile: Dockerfile
     container_name: gateway
+    mem_limit: 512m
+    restart: unless-stopped
     env_file:
       - .env.gateway
     volumes:

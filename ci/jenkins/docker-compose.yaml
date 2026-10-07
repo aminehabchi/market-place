@@ -6,15 +6,17 @@ services:
       args:
         DOCKER_GID: ${DOCKER_GID:-989}
     container_name: buy01-jenkins
+    mem_limit: 1536m
     group_add:
       - "${DOCKER_GID:-989}"
     networks:
       - shared-net
     restart: unless-stopped
     ports:
-      - "8089:8080"
-      - "50000:50000"
-      - "5006:5006"
+      # Loopback only; the public UI goes through Caddy (jenkins.bouchikhi.com).
+      - "127.0.0.1:8089:8080"
+      - "127.0.0.1:50000:50000"
+      - "127.0.0.1:5006:5006"
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock

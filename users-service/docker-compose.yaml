@@ -2,6 +2,9 @@ services:
   user-mongodb:
     image: mongo:4.4
     container_name: user-mongodb
+    mem_limit: 384m
+    restart: unless-stopped
+    command: ["--wiredTigerCacheSizeGB", "0.25"]
     env_file:
       - .env.users
     volumes:
@@ -20,6 +23,7 @@ services:
       dockerfile: users-service/service/dockerfile
     restart: on-failure
     container_name: users-service
+    mem_limit: 512m
     env_file:
       - .env.users
 

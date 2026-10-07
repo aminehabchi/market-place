@@ -4,9 +4,10 @@ services:
       context: ./prometheus
       dockerfile: Dockerfile
     container_name: prometheus
+    mem_limit: 512m
     restart: unless-stopped
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090"
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
@@ -25,10 +26,14 @@ services:
 
   grafana:
     image: grafana/grafana
+    environment:
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
     container_name: grafana
+    mem_limit: 256m
     restart: unless-stopped
     ports:
-      - "4002:3000"
+      - "127.0.0.1:4002:3000"
     networks:
       - shared-net
     volumes:
@@ -38,6 +43,7 @@ services:
   node-exporter:
     image: prom/node-exporter
     container_name: node-exporter
+    mem_limit: 64m
     restart: unless-stopped
     networks:
       - shared-net
@@ -50,6 +56,7 @@ services:
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
+    mem_limit: 192m
     restart: unless-stopped
     networks:
       - shared-net
@@ -63,6 +70,7 @@ services:
   kafka-exporter:
     image: danielqsj/kafka-exporter
     container_name: kafka-exporter
+    mem_limit: 64m
     restart: unless-stopped
     command:
       - "--kafka.server=kafka:29092"
