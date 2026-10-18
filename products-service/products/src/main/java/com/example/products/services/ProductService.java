@@ -246,12 +246,16 @@ public class ProductService {
     }
 
     @Observed(name = "marketplace.inventory.stock.reserve", contextualName = "reserve-stock")
-    public Product reserveStock(String reservationId, String productId, long quantity) {
+    public Product reserveStock(String reservationId, String productId, long quantity, String buyerId) {
         UUID id = parseProductId(productId);
-        if (reservationId == null || reservationId.isBlank() || quantity <= 0) {
+        if (reservationId == null || reservationId.isBlank() || quantity <= 0
+                || buyerId == null || buyerId.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid reservation");
         }
+        // The owner check is part of the atomic update so a seller can never reserve
+        // (and later buy) their own stock, whatever the client sends.
         Query query = Query.query(Criteria.where("_id").is(id)
+                .and("userId").ne(buyerId)
                 .and("quantity").gte(quantity)
                 .and("stockReservations.reservationId").ne(reservationId));
         Update update = new Update().inc("quantity", -quantity)
@@ -259,6 +263,13 @@ public class ProductService {
         Product reserved = mongoTemplate.findAndModify(query, update,
                 FindAndModifyOptions.options().returnNew(true), Product.class);
         if (reserved == null) {
+            Product existing = mongoTemplate.findById(id, Product.class);
+            if (existing == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+            }
+            if (buyerId.equals(existing.getUserId())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot buy your own product");
+            }
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Insufficient stock or reservation already exists");
         }

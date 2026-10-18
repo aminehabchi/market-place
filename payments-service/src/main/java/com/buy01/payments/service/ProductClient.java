@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.buy01.payments.dto.ProductSnapshot;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.micrometer.observation.annotation.Observed;
 
 @Service
@@ -57,16 +58,20 @@ public class ProductClient {
     }
 
     @Observed(name = "marketplace.payment.stock.reserve", contextualName = "reserve-product-stock")
-    public ProductSnapshot reserve(String reservationId, String productId, long quantity) {
+    public ProductSnapshot reserve(String reservationId, String productId, long quantity, String buyerId) {
         try {
             ProductEnvelope response = restClient.post()
                     .uri("/api/internal/inventory/reservations")
-                    .body(new ReservationRequest(reservationId, productId, quantity))
+                    .body(new ReservationRequest(reservationId, productId, quantity, buyerId))
                     .retrieve().body(ProductEnvelope.class);
             if (response == null || response.data() == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Invalid reservation response");
             }
             return response.data();
+        } catch (HttpClientErrorException.Forbidden e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot buy your own product", e);
+        } catch (HttpClientErrorException.NotFound e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found", e);
         } catch (HttpClientErrorException.Conflict e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Insufficient product quantity", e);
         } catch (ResponseStatusException e) {
@@ -80,7 +85,7 @@ public class ProductClient {
     public void releaseReservation(String reservationId, String productId, long quantity) {
         try {
             restClient.post().uri("/api/internal/inventory/reservations/release")
-                    .body(new ReservationRequest(reservationId, productId, quantity))
+                    .body(new ReservationRequest(reservationId, productId, quantity, null))
                     .retrieve().toBodilessEntity();
         } catch (HttpClientErrorException.NotFound ignored) {
             // Already released or confirmed; reservation endpoints are idempotent.
@@ -90,5 +95,6 @@ public class ProductClient {
     @JsonIgnoreProperties(ignoreUnknown = true)
     private record ProductEnvelope(ProductSnapshot data) { }
 
-    private record ReservationRequest(String reservationId, String productId, long quantity) { }
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private record ReservationRequest(String reservationId, String productId, long quantity, String buyerId) { }
 }

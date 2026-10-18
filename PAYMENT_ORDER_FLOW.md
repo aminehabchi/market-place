@@ -62,7 +62,7 @@ Both components perform two UX checks before checkout:
 
 They then call `PaymentsService.createCheckoutSession(product)`. On success, the browser navigates to Stripe's hosted URL. On failure, the API error message is shown through the toaster.
 
-These checks improve UX, but client-side checks are not security boundaries. A modified client can bypass them. The backend remains responsible for price and stock integrity. At present, the seller-versus-buyer rule is enforced only in the frontend; the payment backend does not receive product owner data in `ProductSnapshot` and therefore does not independently reject self-purchases.
+These checks improve UX, but client-side checks are not security boundaries. A modified client can bypass them. The backend remains responsible for price and stock integrity. The seller-versus-buyer rule is also enforced on the backend: the payments service sends the buyer id with the stock reservation, and the products service rejects the reservation with `403` inside the same atomic update when the buyer owns the product.
 
 ### Angular payments client
 

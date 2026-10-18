@@ -74,7 +74,7 @@ public class StripeCheckoutService {
         String orderId = orderService == null ? null : orderService.newOrderId();
         ProductSnapshot product = orderService == null
                 ? productLookup.get(request.productId(), request.quantity())
-                : productClient.reserve(orderId, request.productId(), request.quantity());
+                : productClient.reserve(orderId, request.productId(), request.quantity(), userId);
         if (orderService != null) {
             try {
                 orderService.create(orderId, product, request.quantity(), userId);

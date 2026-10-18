@@ -1,10 +1,12 @@
 package com.example.products.controllers;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.products.dto.StockReservationRequest;
 import com.example.products.models.Product;
@@ -24,8 +26,11 @@ public class InternalInventoryController {
 
     @PostMapping("/reservations")
     public ResponseEntity<ApiResponse<Product>> reserve(@RequestBody @Valid StockReservationRequest request) {
+        if (request.buyerId() == null || request.buyerId().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Buyer is required");
+        }
         return ResponseEntity.ok(ApiResponse.success(productService.reserveStock(
-                request.reservationId(), request.productId(), request.quantity())));
+                request.reservationId(), request.productId(), request.quantity(), request.buyerId())));
     }
 
     @PostMapping("/reservations/confirm")
