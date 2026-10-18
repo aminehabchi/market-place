@@ -6,5 +6,6 @@ import jakarta.validation.constraints.Positive;
 public record StockReservationRequest(
         @NotBlank String reservationId,
         @NotBlank String productId,
-        @Positive long quantity) {
+        @Positive long quantity,
+        String buyerId) {
 }
