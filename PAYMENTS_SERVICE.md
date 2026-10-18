@@ -286,7 +286,6 @@ The current service creates one-time Stripe Checkout payment sessions. A product
 
 - Stripe webhook signature verification and idempotent event processing;
 - persistent payment/order state rather than trusting browser return URLs;
-- server-side product and price lookup instead of accepting authoritative amounts from the client;
 - Stripe Connect accounts, onboarding, destination charges, application fees, transfers, and refunds;
 - Stripe Tax calculation and customer address collection;
 - Billing subscriptions where recurring marketplace plans are required;
@@ -296,11 +295,13 @@ The current service creates one-time Stripe Checkout payment sessions. A product
 - structured metrics, tracing, alerts, and dead-letter handling;
 - integration tests against Stripe test mode or a controlled mock server.
 
-Most importantly, the backend must derive the payable amount from trusted product data. Client-provided names and prices are useful for UI requests but must not become the final source of truth for real charges.
+The payable amount is already derived from trusted product data. The checkout request accepts only `productId` and `quantity`; any other field a modified browser adds, such as `price`, `unitAmount` or `currency`, is ignored when the JSON is read. Payments reserves stock through the private `/api/internal/inventory/reservations` endpoint, which is not routed by the gateway, and builds the Stripe line item from the name and price that products-service returns from MongoDB. `CheckoutPriceTamperingTest` covers this.
 
 ## Next Implementation Plan
 
-The next version should stop accepting an authoritative amount, product name, seller, or currency from Angular. The browser is not a trusted source because a buyer can modify any outgoing request. Angular should send only the buyer's choices:
+Status: the request shape below, server-side price lookup (Phase 1–2, done as a stock reservation rather than a separate `GET .../checkout` endpoint) and the pending order before Stripe (Phase 3) are implemented. Seller payout data and product versioning are still open.
+
+The browser is not a trusted source because a buyer can modify any outgoing request. Angular sends only the buyer's choices:
 
 ```json
 {
